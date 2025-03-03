@@ -17,7 +17,7 @@
           <div class="relative flex items-center justify-between"><a class="relative z-10 pr-4 xl:pr-0" href="index.html">
             <h3 class="text-2xl font-semibold tracking-wide font-canvasans text-[#E6C200]" style="font-family: 'Capxasans', sans-serif; color: #14130e;">✨ MonoGlow</h3>
           </a>
-            <div class="hidden xl:flex xl:justify-center gap-16 xl:absolute xl:w-full xl:top-1/2 xl:left-1/2 xl:transform xl:-translate-y-1/2 xl:-translate-x-1/2 removed"><a class="inline-block text-lg tracking-tight font-medium hover:text-opacity-80 transition duration-200" href="about.html">About</a><a class="inline-block text-lg tracking-tight font-medium hover:text-opacity-80 transition duration-200" href="pricing.html">Pricing</a><a class="inline-block text-lg tracking-tight font-medium hover:text-opacity-80 transition duration-200" href="blog.html">Blog</a></div>
+            <div class="hidden xl:flex xl:justify-center gap-16 xl:absolute xl:w-full xl:top-1/2 xl:left-1/2 xl:transform xl:-translate-y-1/2 xl:-translate-x-1/2 removed"><a class="inline-block text-lg tracking-tight font-medium hover:text-opacity-80 transition duration-200" href="about.html">About</a><a class="inline-block text-lg tracking-tight font-medium hover:text-opacity-80 transition duration-200" href="#">Pricing</a><a class="inline-block text-lg tracking-tight font-medium hover:text-opacity-80 transition duration-200" href="blog.html">Blog</a></div>
             <div class="relative hidden xl:flex items-center gap-2"><a class="inline-flex justify-center items-center text-center h-12 p-5 font-medium tracking-tight text-lg hover:text-white focus:text-white bg-transparent hover:bg-neutral-900 focus:bg-neutral-900 border border-neutral-900 rounded-lg focus:ring-4 focus:ring-neutral-400 transition duration-200" href="login.html">Account</a><a class="inline-flex justify-center items-center text-center h-12 p-5 font-medium tracking-tight text-lg hover:text-white focus:text-white bg-transparent hover:bg-neutral-900 focus:bg-neutral-900 border border-neutral-900 rounded-lg focus:ring-4 focus:ring-neutral-400 transition duration-200" href="contact.html">Contact us</a></div>
             <button class="xl:hidden" x-on:click="mobileNavOpen = !mobileNavOpen">
               <svg xmlns="http://www.w3.org/2000/svg" width="34" height="14" viewbox="0 0 34 14" fill="none">
@@ -48,7 +48,7 @@
                   </svg>
                 </button>
               </div>
-              <div class="flex flex-col gap-8 py-16"><a class="inline-block max-w-max text-lg tracking-tight font-medium hover:text-opacity-80 transition duration-200" href="about.html">About Us</a><a class="inline-block max-w-max text-lg tracking-tight font-medium hover:text-opacity-80 transition duration-200" href="pricing.html">Pricing</a><a class="inline-block max-w-max text-lg tracking-tight font-medium hover:text-opacity-80 transition duration-200" href="blog.html">Blog</a></div>
+              <div class="flex flex-col gap-8 py-16"><a class="inline-block max-w-max text-lg tracking-tight font-medium hover:text-opacity-80 transition duration-200" href="about.html">About Us</a><a class="inline-block max-w-max text-lg tracking-tight font-medium hover:text-opacity-80 transition duration-200" href="#">Pricing</a><a class="inline-block max-w-max text-lg tracking-tight font-medium hover:text-opacity-80 transition duration-200" href="blog.html">Blog</a></div>
               <div class="flex flex-col items-center gap-2"><a class="inline-flex justify-center items-center text-center w-full h-12 p-5 font-medium tracking-tight text-lg hover:text-white focus:text-white bg-transparent hover:bg-neutral-900 focus:bg-neutral-900 border border-neutral-900 rounded-lg focus:ring-4 focus:ring-neutral-400 transition duration-200" href="login.html">Account</a><a class="inline-flex justify-center items-center text-center w-full h-12 p-5 font-medium tracking-tight text-lg hover:text-white focus:text-white bg-transparent hover:bg-neutral-900 focus:bg-neutral-900 border border-neutral-900 rounded-lg focus:ring-4 focus:ring-neutral-400 transition duration-200" href="contact.html">Contact us</a></div>
             </div>
           </nav>
@@ -105,26 +105,26 @@
                   </li>
                 </ul>
                 <a class="inline-flex justify-center items-center text-center w-full h-16 p-5 font-semibold tracking-tight text-xl hover:text-white focus:text-white bg-transparent hover:bg-neutral-900 focus:bg-neutral-900 border border-neutral-900 rounded-lg focus:ring-4 focus:ring-neutral-400 transition duration-200" 
-                href="https://rzp.io/rzp/nUzbZNb" 
-                id="payment-button">
-                Try it now
-             </a>
-             <script>
-               document.getElementById("payment-button").addEventListener("click", function(event) {
-                 event.preventDefault(); // Prevent default link behavior
-                 
-                 // Razorpay Payment Link
-                 let paymentLink = "https://rzp.io/rzp/nUzbZNb"; 
-                 
-                 // Open payment in new tab
-                 window.open(paymentLink, "_blank");
-                 
-                 // Redirect to depression assessment page after a short delay
-                 setTimeout(function() {
-                   window.location.href = "https://monoglow.onrender.com/pages/Mental%20Health%20Assessments/Depression.html";
-                 }, 500); // Small delay to ensure the payment window opens first
-               });
-             </script>
+                  href="https://rzp.io/rzp/txilK9o" 
+                  onclick="openPayment(event)">
+                  Try it now
+                </a>
+
+                <script>
+                  function openPayment(event) {
+                    event.preventDefault(); // Prevent default link behavior
+                    let paymentLink = "https://rzp.io/rzp/txilK9o"; // Razorpay Payment Link
+                    let newTab = window.open(paymentLink, "_blank"); // Open in new tab
+
+                    if (newTab) {
+                      setTimeout(() => {
+                        window.location.href = "payment-confirmation.html"; // Redirect to confirmation page
+                      }, 5000); // Wait 5 sec before redirecting
+                    } else {
+                      alert("Popup blocked! Please allow pop-ups for this site.");
+                    }
+                  }
+                </script>
               </div>
             </div>
             <div class="w-full md:w-1/2 xl:w-1/4 p-2">
