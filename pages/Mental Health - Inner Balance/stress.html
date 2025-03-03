@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inner Balance - Stress & Burnout Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: #fafafa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .progress {
+            height: 4px;
+            background: #edf2f7;
+            margin: 1.5rem 0;
+            border-radius: 2px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #4a5568;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            margin: 2rem 0;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: #2d3748;
+        }
+
+        .options {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .option {
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option:hover {
+            background: #f7fafc;
+        }
+
+        .option.selected {
+            background: #2d3748;
+            color: white;
+            border-color: #2d3748;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        button {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-next {
+            background: #2d3748;
+            color: white;
+        }
+
+        .btn-prev {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results-summary {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+        }
+
+        .recommendations {
+            margin: 1.5rem 0;
+        }
+
+        .recommendations li {
+            margin: 0.5rem 0;
+            margin-left: 1.5rem;
+        }
+        .results-graph {
+            margin-top: 20px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .results-graph h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .mood-tracker {
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding: 1.5rem;
+            background: #f7fafc;
+            border-radius: 6px;
+        }
+        
+        .email-form {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f0f5ff;
+            border-radius: 6px;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+        
+        .submit-btn {
+            background: #2d3748;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+            margin-top: 0.5rem;
+        }
+        
+        .submit-btn:hover {
+            background: #4a5568;
+        }
+        
+        /* Minimal Button Style - Darker Colors */
+        .minimal-button {
+        display: inline-block;
+        font-size: 1rem;
+        font-weight: 200; /* Slightly bolder text */
+        color: #ffffff; /* White text color */
+        text-decoration: none; /* Remove underline */
+        padding: 0.5rem 1.5rem;
+        border: 2px solid #333333; /* Dark border */
+        border-radius: 5px; /* Rounded corners */
+        background-color: #333333; /* Dark button background */
+        transition: all 0.3s ease; /* Smooth hover effect */
+        text-align: center;
+        }
+
+        .minimal-button:hover {
+        background-color: #555555; /* Slightly lighter gray on hover */
+        border-color: #555555; /* Match border with hover color */
+        }
+
+        .sent-notification {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            button {
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="quiz">
+            <h1>Inner Balance - Stress & Burnout Assessment</h1>
+            <p class="description">This therapist-reviewed, advanced mental health assessment evaluates stress levels, burnout risk, and emotional exhaustion. Includes in-depth wellness score, mood fluctuation analysis, and personalized coping strategies.</p>
+            
+            <div class="progress">
+                <div class="progress-bar" style="width: 0%"></div>
+            </div>
+
+            <div class="question">
+                <div class="question-text" id="question-text"></div>
+                <div class="options">
+                    <div class="option" data-value="0">Never</div>
+                    <div class="option" data-value="1">Occasionally</div>
+                    <div class="option" data-value="2">Often</div>
+                    <div class="option" data-value="3">Almost always</div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn-prev" id="prev" disabled>Previous</button>
+                <button class="btn-next" id="next">Next</button>
+            </div>
+        </div>
+
+        <div class="results" style="display: none;">
+            <h1>Your Assessment Results</h1>
+        
+            <!-- Results Summary -->
+            <div class="results-summary">
+                <p id="results-text"></p>
+            </div>
+        
+            <!-- Graphical Representation - Category Breakdown -->
+            <div class="results-graph">
+                <h2>Category Breakdown</h2>
+                <canvas id="resultsChart" width="400" height="200"></canvas>
+            </div>
+            
+            <!-- Stress Fluctuation Analysis -->
+            <div class="results-graph">
+                <h2>Stress Fluctuation Analysis</h2>
+                <p>This line graph visualizes your stress patterns over time based on your responses.</p>
+                <canvas id="stressChart" width="400" height="200"></canvas>
+            </div>
+        
+            <!-- Recommendations Section -->
+            <div class="recommendations">
+                <h2>Professional Coping Strategies</h2>
+                <ul id="recommendations-list"></ul>
+            </div>
+            
+            <!-- Email Form for Report - Updated to use Web3Forms -->
+            <div class="email-form">
+                <h2>Receive Your Detailed Report</h2>
+                <p>Enter your email to receive a comprehensive assessment report with detailed analysis, personalized recommendations, and stress tracking insights.</p>
+                
+                <form id="emailForm" action="https://api.web3forms.com/submit" method="POST">
+                    <!-- Web3Forms Access Key - You need to replace this with your actual key -->
+                    <input type="hidden" name="access_key" value="3827a11b-3ca4-4126-b4d9-14aefffa1da5">
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your mail" required>
+                    </div>
+                    
+                    <!-- Subject field for the email -->
+                    <input type="hidden" name="subject" value="Your Stress & Burnout Assessment Results">
+                    
+                    <!-- Redirect URL (optional) - add your thank you page URL if needed -->
+                    <input type="hidden" name="redirect" value="">
+                    
+                    <!-- Hidden field for assessment data -->
+                    <input type="hidden" id="formData" name="assessment_data" value="">
+                    
+                    <!-- Add honeypot field to prevent spam -->
+                    <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+                    
+                    <button type="submit" id="sendReport" class="submit-btn">Send My Report</button>
+                </form>
+                
+                <div id="sent-notification" class="sent-notification">
+                    Your detailed report has been sent! Please check your email inbox.
+                </div>
+            </div>
+        
+            <!-- Back to Assessments Button -->
+            <a href="#" id="retakeBtn" class="minimal-button" style="margin-top: 2rem; display: inline-block;">Retake Assessment</a>
+        </div>
+        
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Questions from the stress & burnout assessment document
+        const questions = [
+            // Work-Related Stress & Burnout
+            "Do you feel overwhelmed by your workload or responsibilities?",
+            "Do you feel unmotivated or disengaged at work or in daily tasks?",
+            "Do you feel like your work or daily activities lack meaning or purpose?",
+            
+            // Emotional Exhaustion & Fatigue
+            "Do you feel emotionally drained or exhausted at the end of the day?",
+            "Do you find it difficult to feel joy or satisfaction even after completing tasks?",
+            "Do you experience mood swings, irritability, or frustration due to stress?",
+            
+            // Cognitive Overload & Difficulty Focusing
+            "Do you have difficulty concentrating or staying focused on tasks?",
+            "Do you frequently forget things or make careless mistakes due to stress?",
+            "Do you overthink or obsess over minor issues?",
+            
+            // Physical Symptoms of Stress
+            "Do you experience headaches, muscle tension, or body pain due to stress?",
+            "Do you experience trouble sleeping or feel fatigued despite resting?",
+            "Do you experience digestive issues or changes in appetite due to stress?"
+        ];
+
+        // Categorize questions for the report
+        const categories = {
+            "Work-Related Stress & Burnout": [0, 1, 2],
+            "Emotional Exhaustion & Fatigue": [3, 4, 5],
+            "Cognitive Overload & Difficulty Focusing": [6, 7, 8],
+            "Physical Symptoms of Stress": [9, 10, 11]
+        };
+
+        // Generate simulated past stress data for the line graph
+        function generateStressData() {
+            const days = 14; // Past two weeks
+            const stressData = [];
+            
+            // Generate random but somewhat consistent stress data for the past
+            let baseStress = Math.random() * 10;
+            
+            for (let i = days; i >= 1; i--) {
+                // Slightly fluctuate stress with some randomness, but maintain a trend
+                baseStress = Math.max(0, Math.min(10, baseStress + (Math.random() - 0.5) * 2));
+                stressData.push({
+                    day: `Day ${i}`,
+                    stress: baseStress
+                });
+            }
+            
+            return stressData;
+        }
+
+        let currentQuestion = 0;
+        let answers = new Array(questions.length).fill(null);
+        let assessmentDate = new Date();
+        let stressData = generateStressData();
+
+        const quiz = document.querySelector('.quiz');
+        const results = document.querySelector('.results');
+        const questionText = document.getElementById('question-text');
+        const progressBar = document.querySelector('.progress-bar');
+        const options = document.querySelectorAll('.option');
+        const prevButton = document.getElementById('prev');
+        const nextButton = document.getElementById('next');
+        const retakeButton = document.getElementById('retakeBtn');
+
+        function updateQuestion() {
+            questionText.textContent = `${currentQuestion + 1}. ${questions[currentQuestion]}`;
+            progressBar.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            prevButton.disabled = currentQuestion === 0;
+            nextButton.textContent = currentQuestion === questions.length - 1 ? 'Finish' : 'Next';
+
+            options.forEach(option => {
+                option.classList.remove('selected');
+                if (answers[currentQuestion] === parseInt(option.dataset.value)) {
+                    option.classList.add('selected');
+                }
+            });
+        }
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                options.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                answers[currentQuestion] = parseInt(option.dataset.value);
+            });
+        });
+
+        prevButton.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                updateQuestion();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (answers[currentQuestion] === null) {
+                alert('Please select an answer before proceeding.');
+                return;
+            }
+
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                updateQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        retakeButton.addEventListener('click', () => {
+            // Reset the quiz to start
+            currentQuestion = 0;
+            answers = new Array(questions.length).fill(null);
+            assessmentDate = new Date();
+            stressData = generateStressData();
+            
+            // Show quiz, hide results
+            quiz.style.display = 'block';
+            results.style.display = 'none';
+            
+            // Reset notification
+            document.getElementById('sent-notification').style.display = 'none';
+            
+            // Update first question
+            updateQuestion();
+        });
+
+        function showResults() {
+            quiz.style.display = 'none';
+            results.style.display = 'block';
+            
+            const totalScore = answers.reduce((sum, val) => sum + val, 0);
+            const maxScore = questions.length * 3; // Maximum possible score (scale: 0-3)
+            
+            // Calculate category scores for detailed analysis
+            const categoryScores = {};
+            for (const [category, indices] of Object.entries(categories)) {
+                const sum = indices.reduce((acc, index) => acc + answers[index], 0);
+                const maxPossible = indices.length * 3;
+                categoryScores[category] = {
+                    score: sum,
+                    percentage: (sum / maxPossible) * 100
+                };
+            }
+            
+            let stressLevel = '';
+            let resultText = '';
+            let recommendations = [];
+
+            // Determine stress level according to the scoring system
+            if (totalScore <= 10) {
+                stressLevel = 'Low stress, minimal burnout risk';
+                resultText = `Your score (${totalScore}/${maxScore}) indicates low stress with minimal burnout risk.`;
+                recommendations = [
+                    "Continue your current self-care practices",
+                    "Maintain your social connections and support network",
+                    "Practice regular physical activity",
+                    "Continue with mindfulness or relaxation exercises you find helpful"
+                ];
+            } else if (totalScore <= 20) {
+                stressLevel = 'Mild stress, occasional burnout signs';
+                resultText = `Your score (${totalScore}/${maxScore}) indicates mild stress with occasional burnout signs.`;
+                recommendations = [
+                    "Take regular breaks and practice mindfulness exercises",
+                    "Maintain a work-life balance and engage in hobbies",
+                    "Prioritize self-care activities like walking, journaling, or yoga",
+                    "Limit caffeine and alcohol, which may worsen symptoms"
+                ];
+            } else if (totalScore <= 30) {
+                stressLevel = 'Moderate stress, consider stress management strategies';
+                resultText = `Your score (${totalScore}/${maxScore}) indicates moderate stress. Consider implementing stress management strategies.`;
+                recommendations = [
+                    "Identify main stress triggers and develop coping strategies",
+                    "Practice deep breathing techniques and relaxation exercises",
+                    "Consider speaking to a counselor for stress management strategies",
+                    "Engage in regular exercise (yoga, walking, stretching)"
+                ];
+            } else {
+                stressLevel = 'High stress, risk of burnout';
+                resultText = `Your score (${totalScore}/${maxScore}) indicates high stress with risk of burnout. Professional support is recommended.`;
+                recommendations = [
+                    "Seek professional support (therapy or coaching)",
+                    "Make lifestyle changes to improve well-being",
+                    "Consider work adjustments or delegation to manage burnout",
+                    "Develop a crisis plan for overwhelming stress episodes"
+                ];
+            }
+
+            // Add category insights to the result text
+            resultText += "<br><br><strong>Category Analysis:</strong>";
+            for (const [category, data] of Object.entries(categoryScores)) {
+                resultText += `<br>• ${category}: ${data.score} (${Math.round(data.percentage)}%)`;
+            }
+
+            resultText += "<br><br><strong>Next Steps:</strong> A detailed assessment report will be sent to your email, including graphical stress fluctuations, therapist-reviewed insights, and a customized self-care plan.";
+
+            document.getElementById('results-text').innerHTML = resultText;
+            document.getElementById('recommendations-list').innerHTML =
+                recommendations.map(rec => `<li>${rec}</li>`).join('');
+
+            // Store assessment data for email report
+            const assessmentData = {
+                date: assessmentDate.toISOString(),
+                totalScore: totalScore,
+                maxScore: maxScore,
+                stressLevel: stressLevel,
+                categoryScores: categoryScores,
+                recommendations: recommendations,
+                answers: answers
+            };
+            
+            // Add assessment data as hidden field value for the form
+            document.getElementById('formData').value = JSON.stringify(assessmentData);
+
+            // Create data for the category breakdown chart
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryScores),
+                    datasets: [{
+                        label: 'Category Scores',
+                        data: Object.values(categoryScores).map(cat => cat.score),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',  // Work-Related Stress - Pink/Red
+                            'rgba(54, 162, 235, 0.6)',  // Emotional Exhaustion - Blue
+                            'rgba(255, 206, 86, 0.6)',  // Cognitive Overload - Yellow
+                            'rgba(75, 192, 192, 0.6)'   // Physical Symptoms - Teal
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true },
+                        tooltip: { 
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const categoryName = context.label;
+                                    const score = context.raw;
+                                    const maxScore = categories[categoryName].length * 3;
+                                    return `${categoryName}: ${score}/${maxScore} (${Math.round((score/maxScore)*100)}%)`;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: `Stress Level: ${stressLevel} (${totalScore}/${maxScore})`
+                        }
+                    }
+                }
+            });
+            
+            // Create stress fluctuation line graph
+            const stressCtx = document.getElementById('stressChart').getContext('2d');
+            
+            // Add today's data point based on assessment score
+            // Convert stress score to a 0-10 stress scale (higher score = higher stress)
+            const todayStress = (totalScore / maxScore) * 10;
+            const stressDataForChart = [...stressData, {
+                day: 'Today',
+                stress: todayStress
+            }];
+            
+            new Chart(stressCtx, {
+                type: 'line',
+                data: {
+                    labels: stressDataForChart.map(d => d.day),
+                    datasets: [{
+                        label: 'Stress Levels',
+                        data: stressDataForChart.map(d => d.stress),
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 10,
+                            title: {
+                                display: true,
+                                text: 'Stress Level (0-10)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time Period'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Your Stress Fluctuations Over Time'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Stress: ${context.raw.toFixed(1)}/10`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Set up email form submission with Web3Forms
+            document.getElementById('emailForm').addEventListener('submit', function(e) {
+                // Show the notification when form is submitted
+                document.getElementById('sent-notification').style.display = 'block';
+                
+                // Let Web3Forms handle the submission
+                // The form will automatically submit to Web3Forms API
+            });
+        }
+
+        // Initialize the first question
+        updateQuestion();
+    </script>
+</body>
+</html>

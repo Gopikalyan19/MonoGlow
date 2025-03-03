@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sexuality Spectrum Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: #fafafa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .progress {
+            height: 4px;
+            background: #edf2f7;
+            margin: 1.5rem 0;
+            border-radius: 2px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #4a5568;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            margin: 2rem 0;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: #2d3748;
+        }
+
+        .options {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .option {
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option:hover {
+            background: #f7fafc;
+        }
+
+        .option.selected {
+            background: #2d3748;
+            color: white;
+            border-color: #2d3748;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        button {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-next {
+            background: #2d3748;
+            color: white;
+        }
+
+        .btn-prev {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results-summary {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+        }
+
+        .recommendations {
+            margin: 1.5rem 0;
+        }
+
+        .recommendations li {
+            margin: 0.5rem 0;
+            margin-left: 1.5rem;
+        }
+        
+        .results-graph {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .results-graph h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .minimal-button {
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: 200;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem 1.5rem;
+            border: 2px solid #333333;
+            border-radius: 5px;
+            background-color: #333333;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .minimal-button:hover {
+            background-color: #555555;
+            border-color: #555555;
+        }
+
+        .section-title {
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            color: #2d3748;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            button {
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="quiz">
+            <h1>Sexuality Spectrum Test</h1>
+            <p class="description">Designed to assess where you might fall on the sexuality spectrum based on attractions, experiences, and feelings. Inspired by the Kinsey Scale, Klein Sexual Orientation Grid (KSOG), and Storms Sexuality Axis models.</p>
+            
+            <div class="progress">
+                <div class="progress-bar" style="width: 0%"></div>
+            </div>
+
+            <div class="question">
+                <div class="section-title" id="section-title"></div>
+                <div class="question-text" id="question-text"></div>
+                <div class="options" id="options-container">
+                    <!-- Options will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn-prev" id="prev" disabled>Previous</button>
+                <button class="btn-next" id="next">Next</button>
+            </div>
+        </div>
+
+        <div class="results" style="display: none;">
+            <h1>Your Results</h1>
+        
+            <!-- Results Summary -->
+            <div class="results-summary">
+                <p id="results-text"></p>
+                <p id="score-text" style="margin-top: 10px; font-weight: bold;"></p>
+            </div>
+        
+            <!-- Graphical Representation -->
+            <div class="results-graph">
+                <h2>Sexuality Spectrum</h2>
+                <canvas id="resultsChart" width="400" height="200"></canvas>
+            </div>
+        
+            <!-- Recommendations Section -->
+            <div class="recommendations">
+                <h2>Next Steps & Insights</h2>
+                <ul id="recommendations-list"></ul>
+            </div>
+        
+            <!-- Back to Assessments Button -->
+            <a href="../assessments.html" class="minimal-button">Back to Assessments</a>
+        </div>
+        
+    </div>
+
+    <script>
+        const questions = [
+            {
+                section: "Sexual Attraction",
+                text: "Who are you most sexually attracted to?",
+                options: [
+                    { text: "Only the opposite gender", value: 0 },
+                    { text: "Mostly the opposite gender, but sometimes the same gender", value: 1 },
+                    { text: "Equally attracted to all genders", value: 3 },
+                    { text: "Mostly the same gender, but sometimes the opposite gender", value: 5 },
+                    { text: "Only the same gender", value: 6 },
+                    { text: "I do not experience sexual attraction (Asexual)", value: "A" }
+                ]
+            },
+            {
+                section: "Sexual Attraction",
+                text: "Have you ever felt romantic feelings for someone outside your primary sexual preference?",
+                options: [
+                    { text: "Never", value: 0 },
+                    { text: "Rarely", value: 1 },
+                    { text: "Sometimes", value: 3 },
+                    { text: "Often", value: 5 },
+                    { text: "Always", value: 6 }
+                ]
+            },
+            {
+                section: "Sexual Attraction",
+                text: "When imagining an ideal romantic partner, what gender(s) come to mind?",
+                options: [
+                    { text: "Only the opposite gender", value: 0 },
+                    { text: "Mostly the opposite gender, but sometimes the same gender", value: 1 },
+                    { text: "Any gender, I don't mind", value: 3 },
+                    { text: "Mostly the same gender, but sometimes the opposite gender", value: 5 },
+                    { text: "Only the same gender", value: 6 }
+                ]
+            },
+            {
+                section: "Sexual Behavior & Experiences",
+                text: "Have you ever had a sexual experience with someone of the same gender?",
+                options: [
+                    { text: "No, and I have no desire to", value: 0 },
+                    { text: "No, but I'm curious about it", value: 1 },
+                    { text: "Yes, but I prefer the opposite gender", value: 2 },
+                    { text: "Yes, and I enjoy both genders equally", value: 3 },
+                    { text: "Yes, and I mostly prefer the same gender", value: 5 },
+                    { text: "Yes, and I exclusively prefer the same gender", value: 6 }
+                ]
+            },
+            {
+                section: "Sexual Behavior & Experiences",
+                text: "Have you ever had a romantic relationship with someone of the same gender?",
+                options: [
+                    { text: "No, and I don't want to", value: 0 },
+                    { text: "No, but I'm open to it", value: 1 },
+                    { text: "Yes, but I generally prefer the opposite gender", value: 2 },
+                    { text: "Yes, I don't have a strong preference for gender in relationships", value: 3 },
+                    { text: "Yes, I mostly prefer the same gender", value: 5 },
+                    { text: "Yes, and I exclusively prefer the same gender", value: 6 }
+                ]
+            },
+            {
+                section: "Emotional & Romantic Preferences",
+                text: "Who do you emotionally connect with the most in relationships?",
+                options: [
+                    { text: "Only the opposite gender", value: 0 },
+                    { text: "Mostly the opposite gender, but sometimes the same gender", value: 1 },
+                    { text: "No strong preference, I connect with any gender", value: 3 },
+                    { text: "Mostly the same gender, but sometimes the opposite gender", value: 5 },
+                    { text: "Only the same gender", value: 6 }
+                ]
+            },
+            {
+                section: "Emotional & Romantic Preferences",
+                text: "If there were no social expectations or stigma, would your attraction change?",
+                options: [
+                    { text: "No, I would still only like the opposite gender", value: 0 },
+                    { text: "Maybe, I might explore more", value: 2 },
+                    { text: "Yes, I would feel freer to be with anyone I'm attracted to", value: 3 },
+                    { text: "No, I would still only like the same gender", value: 6 }
+                ]
+            },
+            {
+                section: "Fantasy & Subconscious Attraction",
+                text: "Have you ever had romantic or sexual dreams about someone outside of your primary preference?",
+                options: [
+                    { text: "Never", value: 0 },
+                    { text: "Rarely", value: 1 },
+                    { text: "Occasionally", value: 3 },
+                    { text: "Frequently", value: 5 },
+                    { text: "Always", value: 6 }
+                ]
+            },
+            {
+                section: "Fantasy & Subconscious Attraction",
+                text: "When watching movies or reading, do you feel attracted to characters of different genders?",
+                options: [
+                    { text: "Only the opposite gender", value: 0 },
+                    { text: "Mostly the opposite gender, but sometimes the same gender", value: 1 },
+                    { text: "No strong preference, I connect with any gender", value: 3 },
+                    { text: "Mostly the same gender, but sometimes the opposite gender", value: 5 },
+                    { text: "Only the same gender", value: 6 }
+                ]
+            },
+            {
+                section: "Self-Perception & Identity",
+                text: "How do you currently identify your sexuality?",
+                options: [
+                    { text: "Heterosexual (Straight)", value: 0 },
+                    { text: "Mostly heterosexual but with occasional same-gender attraction", value: 1 },
+                    { text: "Bisexual/Pansexual", value: 3 },
+                    { text: "Mostly homosexual but with occasional opposite-gender attraction", value: 5 },
+                    { text: "Homosexual (Gay/Lesbian)", value: 6 },
+                    { text: "Asexual or other", value: "A" }
+                ]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let answers = new Array(questions.length).fill(null);
+
+        const quiz = document.querySelector('.quiz');
+        const results = document.querySelector('.results');
+        const sectionTitle = document.getElementById('section-title');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const progressBar = document.querySelector('.progress-bar');
+        const prevButton = document.getElementById('prev');
+        const nextButton = document.getElementById('next');
+
+        function updateQuestion() {
+            const question = questions[currentQuestion];
+            sectionTitle.textContent = question.section;
+            questionText.textContent = `${currentQuestion + 1}. ${question.text}`;
+            progressBar.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            prevButton.disabled = currentQuestion === 0;
+            nextButton.textContent = currentQuestion === questions.length - 1 ? 'Finish' : 'Next';
+
+            // Clear previous options
+            optionsContainer.innerHTML = "";
+
+            // Create new options
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option.text;
+                optionElement.dataset.value = option.value;
+                
+                if (answers[currentQuestion] !== null && answers[currentQuestion] === option.value) {
+                    optionElement.classList.add('selected');
+                }
+                
+                optionElement.addEventListener('click', () => {
+                    document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+                    optionElement.classList.add('selected');
+                    answers[currentQuestion] = option.value;
+                });
+                
+                optionsContainer.appendChild(optionElement);
+            });
+        }
+
+        prevButton.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                updateQuestion();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (answers[currentQuestion] === null) {
+                alert('Please select an answer before proceeding.');
+                return;
+            }
+
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                updateQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        function calculateScaleScore() {
+            const validScores = answers.filter(answer => typeof answer === 'number');
+            if (validScores.length === 0) return { score: "A", totalScore: 0 };
+            
+            const totalScore = validScores.reduce((sum, val) => sum + val, 0);
+            const averageScore = totalScore / validScores.length;
+            
+            // Round to nearest whole number on the Kinsey Scale
+            return { 
+                score: Math.round(averageScore),
+                totalScore: totalScore,
+                validResponses: validScores.length
+            };
+        }
+
+        function showResults() {
+            quiz.style.display = 'none';
+            results.style.display = 'block';
+
+            const { score, totalScore, validResponses } = calculateScaleScore();
+            
+            let scaleDescription = '';
+            let resultText = '';
+            const recommendations = [
+                "Understanding Your Identity – Learn more about fluidity in attraction.",
+                "Resources & Communities – Explore support networks for LGBTQ+ individuals.",
+                "Self-Reflection Journal – Record your thoughts and experiences over time."
+            ];
+
+            // Determine scale description
+            if (score === "A") {
+                scaleDescription = 'Asexual Variation';
+                resultText = "Your responses suggest you may identify as asexual, meaning you experience little to no sexual attraction regardless of gender.";
+            } else {
+                switch(score) {
+                    case 0:
+                        scaleDescription = 'Exclusively Heterosexual';
+                        resultText = "Your responses indicate an exclusive attraction to the opposite gender.";
+                        break;
+                    case 1:
+                        scaleDescription = 'Predominantly Heterosexual, Occasionally Same-Sex Interest';
+                        resultText = "Your responses suggest you're predominantly attracted to the opposite gender with occasional same-gender interest.";
+                        break;
+                    case 2:
+                        scaleDescription = 'Mostly Heterosexual, Significant Same-Sex Interest';
+                        resultText = "Your responses indicate you're mostly attracted to the opposite gender with significant same-gender interest.";
+                        break;
+                    case 3:
+                        scaleDescription = 'Equally Attracted to All Genders (Bisexual/Pansexual)';
+                        resultText = "Your responses suggest you experience attraction to people regardless of gender.";
+                        break;
+                    case 4:
+                        scaleDescription = 'Mostly Homosexual, Occasional Opposite-Sex Interest';
+                        resultText = "Your responses indicate you're mostly attracted to the same gender with occasional opposite-gender interest.";
+                        break;
+                    case 5:
+                        scaleDescription = 'Predominantly Homosexual, Rarely Opposite-Sex Interest';
+                        resultText = "Your responses suggest you're predominantly attracted to the same gender with rare opposite-gender interest.";
+                        break;
+                    case 6:
+                        scaleDescription = 'Exclusively Homosexual';
+                        resultText = "Your responses indicate an exclusive attraction to the same gender.";
+                        break;
+                }
+            }
+
+            document.getElementById('results-text').textContent = resultText;
+            
+            if (score === "A") {
+                document.getElementById('score-text').textContent = `Your result: ${scaleDescription}`;
+            } else {
+                document.getElementById('score-text').textContent = `Your score: ${score}/6 - ${scaleDescription}`;
+            }
+            
+            document.getElementById('recommendations-list').innerHTML =
+                recommendations.map(rec => `<li>${rec}</li>`).join('');
+
+            // Render the chart (only if not asexual)
+            if (score !== "A") {
+                renderChart(score);
+            } else {
+                document.querySelector('.results-graph').style.display = 'none';
+            }
+        }
+        
+        function renderChart(score) {
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+            
+            const chartData = [0, 0, 0, 0, 0, 0, 0]; // 7 positions (0-6 on Kinsey Scale)
+            chartData[score] = 1; // Mark the user's position
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['0 - Exclusively Heterosexual', 
+                             '1 - Predominantly Heterosexual', 
+                             '2 - Mostly Heterosexual', 
+                             '3 - Bisexual/Pansexual', 
+                             '4 - Mostly Homosexual', 
+                             '5 - Predominantly Homosexual', 
+                             '6 - Exclusively Homosexual'],
+                    datasets: [{
+                        label: 'Your Position',
+                        data: chartData,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(255, 205, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(201, 203, 207, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgb(255, 99, 132)',
+                            'rgb(255, 159, 64)',
+                            'rgb(255, 205, 86)',
+                            'rgb(75, 192, 192)',
+                            'rgb(54, 162, 235)',
+                            'rgb(153, 102, 255)',
+                            'rgb(201, 203, 207)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Your position on the sexuality spectrum';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Initialize the first question
+        updateQuestion();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>
