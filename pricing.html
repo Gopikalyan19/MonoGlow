@@ -104,26 +104,25 @@
                     </div><span class="text-neutral-600 font-medium">Encourages upgrade</span>
                   </li>
                 </ul>
-                <a class="inline-flex justify-center items-center text-center w-full h-16 p-5 font-semibold tracking-tight text-xl hover:text-white focus:text-white bg-transparent hover:bg-neutral-900 focus:bg-neutral-900 border border-neutral-900 rounded-lg focus:ring-4 focus:ring-neutral-400 transition duration-200" 
-                  href="https://rzp.io/rzp/txilK9o" 
-                  onclick="openPayment(event)">
-                  Try it now
-                </a>
-
+                <button id="pay-btn" class="inline-flex justify-center items-center text-center w-full h-16 p-5 font-semibold tracking-tight text-xl hover:text-white focus:text-white bg-transparent hover:bg-neutral-900 focus:bg-neutral-900 border border-neutral-900 rounded-lg focus:ring-4 focus:ring-neutral-400 transition duration-200">Pay Now</button>
+                <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
                 <script>
-                  function openPayment(event) {
-                    event.preventDefault(); // Prevent default link behavior
-                    let paymentLink = "https://rzp.io/rzp/txilK9o"; // Razorpay Payment Link
-                    let newTab = window.open(paymentLink, "_blank"); // Open in new tab
-
-                    if (newTab) {
-                      setTimeout(() => {
-                        window.location.href = "payment-confirmation.html"; // Redirect to confirmation page
-                      }, 5000); // Wait 5 sec before redirecting
-                    } else {
-                      alert("Popup blocked! Please allow pop-ups for this site.");
-                    }
-                  }
+                document.getElementById("pay-btn").onclick = function () {
+                  var options = {
+                    key: "rzp_live_qbsDVJGOBqrt5Y", // Replace with your Razorpay Key ID
+                    amount: 2500, // ₹25 (2500 paise)
+                    currency: "INR",
+                    order_id: "order_Q2KT8NT2dydNbz", // Use the generated order ID
+                    name: "MonoGlow",
+                    description: "Test Transaction",
+                    handler: function (response) {
+                      alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
+                      window.location.href = "pages/Mental Health Assessments/Depression.html"; // Redirect after payment
+                    },
+                  };
+                  var rzp = new Razorpay(options);
+                  rzp.open();
+                };
                 </script>
               </div>
             </div>
