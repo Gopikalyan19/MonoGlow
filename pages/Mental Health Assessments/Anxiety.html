@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: #fafafa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .progress {
+            height: 4px;
+            background: #edf2f7;
+            margin: 1.5rem 0;
+            border-radius: 2px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #4a5568;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            margin: 2rem 0;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: #2d3748;
+        }
+
+        .options {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .option {
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option:hover {
+            background: #f7fafc;
+        }
+
+        .option.selected {
+            background: #2d3748;
+            color: white;
+            border-color: #2d3748;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        button {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-next {
+            background: #2d3748;
+            color: white;
+        }
+
+        .btn-prev {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results-summary {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+        }
+
+        .recommendations {
+            margin: 1.5rem 0;
+        }
+
+        .recommendations li {
+            margin: 0.5rem 0;
+            margin-left: 1.5rem;
+        }
+        .results-graph {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .results-graph h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Minimal Button Style - Darker Colors */
+        .minimal-button {
+        display: inline-block;
+        font-size: 1rem;
+        font-weight: 200; /* Slightly bolder text */
+        color: #ffffff; /* White text color */
+        text-decoration: none; /* Remove underline */
+        padding: 0.5rem 1.5rem;
+        border: 2px solid #333333; /* Dark border */
+        border-radius: 5px; /* Rounded corners */
+        background-color: #333333; /* Dark button background */
+        transition: all 0.3s ease; /* Smooth hover effect */
+        text-align: center;
+        }
+
+        .minimal-button:hover {
+        background-color: #555555; /* Slightly lighter gray on hover */
+        border-color: #555555; /* Match border with hover color */
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            button {
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="quiz">
+            <h1>Mental Health Assessment</h1>
+            <p class="description">A brief questionnaire to help understand your mental well-being. Based on validated psychological scales.</p>
+            
+            <div class="progress">
+                <div class="progress-bar" style="width: 0%"></div>
+            </div>
+
+            <div class="question">
+                <div class="question-text" id="question-text"></div>
+                <div class="options">
+                    <div class="option" data-value="0">Never</div>
+                    <div class="option" data-value="1">Rarely/Sometimes</div>
+                    <div class="option" data-value="2">Often</div>
+                    <div class="option" data-value="3">Almost Always</div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn-prev" id="prev" disabled>Previous</button>
+                <button class="btn-next" id="next">Next</button>
+            </div>
+        </div>
+
+        <div class="results" style="display: none;">
+            <h1>Your Results</h1>
+        
+            <!-- Results Summary -->
+            <div class="results-summary">
+                <p id="results-text"></p>
+            </div>
+        
+            <!-- Graphical Representation -->
+            <div class="results-graph">
+                <h2>Graphical Representation</h2>
+                <canvas id="resultsChart" width="400" height="200"></canvas>
+            </div>
+        
+            <!-- Recommendations Section -->
+            <div class="recommendations">
+                <h2>Recommendations</h2>
+                <ul id="recommendations-list"></ul>
+            </div>
+        
+            <!-- Back to Assessments Button -->
+            <a href="/Mental-Health-Assessments.html" class="minimal-button">Back to Assessments</a>
+        </div>
+        
+    </div>
+
+    <script>
+        // Questions categorized by type
+        const questions = [
+            // General Anxiety Indicators
+            "How often do you feel nervous, anxious, or on edge?",
+            "Do you find it difficult to control your worries?",
+            "Do you worry excessively about different things?",
+            
+            // Physical Symptoms
+            "Do you experience restlessness or feel on edge?",
+            "Do you have physical symptoms like muscle tension, headaches, or stomach issues when anxious?",
+            "Do you experience rapid heartbeat, sweating, or dizziness when anxious?",
+            
+            // Cognitive Symptoms
+            "Do you have difficulty concentrating because of anxious thoughts?",
+            "Do you overthink situations or expect the worst outcomes?",
+            "Do you experience irrational fears or intrusive thoughts?",
+            
+            // Behavioral Symptoms
+            "Do you avoid situations or places due to anxiety?",
+            "Do you feel easily irritated or overwhelmed by small problems?",
+            "Do you feel exhausted from constantly worrying?",
+            
+            // Impact on Daily Life
+            "How often does anxiety interfere with your daily tasks (work, school, etc.)?",
+            "Do you have trouble falling or staying asleep due to anxious thoughts?",
+            "Do you feel a sense of dread or fear for no clear reason?"
+        ];
+
+        // Categorize questions for the report
+        const categories = {
+            "General Anxiety": [0, 1, 2],
+            "Physical Symptoms": [3, 4, 5],
+            "Cognitive Symptoms": [6, 7, 8],
+            "Behavioral Symptoms": [9, 10, 11],
+            "Daily Life Impact": [12, 13, 14]
+        };
+
+        let currentQuestion = 0;
+        let answers = new Array(questions.length).fill(null);
+
+        const quiz = document.querySelector('.quiz');
+        const results = document.querySelector('.results');
+        const questionText = document.getElementById('question-text');
+        const progressBar = document.querySelector('.progress-bar');
+        const options = document.querySelectorAll('.option');
+        const prevButton = document.getElementById('prev');
+        const nextButton = document.getElementById('next');
+
+        function updateQuestion() {
+            questionText.textContent = `${currentQuestion + 1}. ${questions[currentQuestion]}`;
+            progressBar.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            prevButton.disabled = currentQuestion === 0;
+            nextButton.textContent = currentQuestion === questions.length - 1 ? 'Finish' : 'Next';
+
+            options.forEach(option => {
+                option.classList.remove('selected');
+                if (answers[currentQuestion] === parseInt(option.dataset.value)) {
+                    option.classList.add('selected');
+                }
+            });
+        }
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                options.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                answers[currentQuestion] = parseInt(option.dataset.value);
+            });
+        });
+
+        prevButton.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                updateQuestion();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (answers[currentQuestion] === null) {
+                alert('Please select an answer before proceeding.');
+                return;
+            }
+
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                updateQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        function showResults() {
+            quiz.style.display = 'none';
+            results.style.display = 'block';
+
+            const totalScore = answers.reduce((sum, val) => sum + val, 0);
+            const maxScore = questions.length * 3; // Maximum possible score (new scale: 0-3)
+            
+            // Calculate category scores for detailed analysis
+            const categoryScores = {};
+            for (const [category, indices] of Object.entries(categories)) {
+                const sum = indices.reduce((acc, index) => acc + answers[index], 0);
+                const maxPossible = indices.length * 3;
+                categoryScores[category] = {
+                    score: sum,
+                    percentage: (sum / maxPossible) * 100
+                };
+            }
+            
+            let anxietyLevel = '';
+            let resultText = '';
+            let recommendations = [];
+
+            // Determine anxiety level according to the scoring system from document 2
+            if (totalScore <= 5) {
+                anxietyLevel = 'Minimal Anxiety';
+                resultText = `Your responses indicate minimal anxiety symptoms (Score: ${totalScore}/${maxScore}).`;
+                recommendations = [
+                    "Maintain a balanced lifestyle with regular exercise",
+                    "Continue practicing stress management when needed",
+                    "Engage in enjoyable activities and hobbies",
+                    "Maintain social connections and support systems"
+                ];
+            } else if (totalScore <= 10) {
+                anxietyLevel = 'Mild Anxiety';
+                resultText = `Your responses suggest mild anxiety symptoms (Score: ${totalScore}/${maxScore}).`;
+                recommendations = [
+                    "Practice deep breathing exercises daily (Box Breathing, 4-7-8 Method)",
+                    "Try mindfulness meditation for 10-15 minutes daily",
+                    "Maintain a regular sleep schedule",
+                    "Consider limiting caffeine and alcohol intake"
+                ];
+            } else if (totalScore <= 15) {
+                anxietyLevel = 'Moderate Anxiety';
+                resultText = `Your responses indicate moderate anxiety symptoms (Score: ${totalScore}/${maxScore}).`;
+                recommendations = [
+                    "Use cognitive behavioral techniques to challenge negative thoughts",
+                    "Practice guided journaling to process emotions",
+                    "Establish a regular exercise routine",
+                    "Consider speaking with a mental health professional"
+                ];
+            } else if (totalScore <= 21) {
+                anxietyLevel = 'Severe Anxiety';
+                resultText = `Your responses suggest severe anxiety symptoms (Score: ${totalScore}/${maxScore}).`;
+                recommendations = [
+                    "Implement structured relaxation methods (Progressive Muscle Relaxation)",
+                    "Seek support from a counselor or therapist",
+                    "Join a support group for anxiety",
+                    "Establish a consistent self-care routine"
+                ];
+            } else {
+                anxietyLevel = 'Extreme Anxiety';
+                resultText = `Your responses indicate extreme anxiety symptoms (Score: ${totalScore}/${maxScore}).`;
+                recommendations = [
+                    "Professional therapy is highly recommended",
+                    "Consider consultation for possible medication options",
+                    "Practice regular monitoring through assessments",
+                    "Build a strong support network with family and friends",
+                    "Practice daily grounding exercises and stress management techniques"
+                ];
+            }
+
+            // Add category insights to the result text
+            resultText += "<br><br><strong>Category Analysis:</strong>";
+            for (const [category, data] of Object.entries(categoryScores)) {
+                resultText += `<br>• ${category}: ${data.score} (${Math.round(data.percentage)}%)`;
+            }
+
+            document.getElementById('results-text').innerHTML = resultText;
+            document.getElementById('recommendations-list').innerHTML =
+                recommendations.map(rec => `<li>${rec}</li>`).join('');
+
+            // Create data for the primary chart (doughnut chart)
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryScores),
+                    datasets: [{
+                        label: 'Category Scores',
+                        data: Object.values(categoryScores).map(cat => cat.score),
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true },
+                        tooltip: { 
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const categoryName = context.label;
+                                    const score = context.raw;
+                                    const maxScore = categories[categoryName].length * 3;
+                                    return `${categoryName}: ${score}/${maxScore} (${Math.round((score/maxScore)*100)}%)`;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: `Anxiety Level: ${anxietyLevel} (${totalScore}/${maxScore})`
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize the first question
+        updateQuestion();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>

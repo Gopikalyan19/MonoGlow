@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindful Explorer - Social Anxiety & Confidence Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: #fafafa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #ebf8ff;
+            color: #2b6cb0;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .progress {
+            height: 4px;
+            background: #edf2f7;
+            margin: 1.5rem 0;
+            border-radius: 2px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #4a5568;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            margin: 2rem 0;
+        }
+
+        .category-label {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: #2d3748;
+        }
+
+        .options {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .option {
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option:hover {
+            background: #f7fafc;
+        }
+
+        .option.selected {
+            background: #2d3748;
+            color: white;
+            border-color: #2d3748;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        button {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-next {
+            background: #2d3748;
+            color: white;
+        }
+
+        .btn-prev {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results-summary {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+        }
+
+        .results-severity {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+
+        .low { color: #38a169; }
+        .mild { color: #3182ce; }
+        .moderate { color: #dd6b20; }
+        .high { color: #e53e3e; }
+        .severe { color: #822727; }
+
+        .recommendations {
+            margin: 1.5rem 0;
+        }
+
+        .recommendations li {
+            margin: 0.5rem 0;
+            margin-left: 1.5rem;
+        }
+        
+        .results-graph {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .results-graph h2 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .minimal-button {
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: 200;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem 1.5rem;
+            border: 2px solid #333333;
+            border-radius: 5px;
+            background-color: #333333;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .minimal-button:hover {
+            background-color: #555555;
+            border-color: #555555;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            button {
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="quiz">
+            <h1>Mindful Explorer - Social Anxiety & Confidence Assessment</h1>
+            <p class="description">Based on validated psychological scales including Liebowitz Social Anxiety Scale (LSAS), Social Interaction Anxiety Scale (SIAS), and Rosenberg Self-Esteem Scale (RSES).</p>
+            <div>
+                <span class="badge">LSAS</span>
+                <span class="badge">SIAS</span>
+                <span class="badge">RSES</span>
+            </div>
+            
+            <div class="progress">
+                <div class="progress-bar" style="width: 0%"></div>
+            </div>
+
+            <div class="question">
+                <div class="category-label" id="category-label"></div>
+                <div class="question-text" id="question-text"></div>
+                <div class="options">
+                    <div class="option" data-value="0">Not at all</div>
+                    <div class="option" data-value="1">Slightly</div>
+                    <div class="option" data-value="2">Moderately</div>
+                    <div class="option" data-value="3">Very much</div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn-prev" id="prev" disabled>Previous</button>
+                <button class="btn-next" id="next">Next</button>
+            </div>
+        </div>
+
+        <div class="results" style="display: none;">
+            <h1>Your Social Anxiety & Confidence Assessment Results</h1>
+        
+            <!-- Results Summary -->
+            <div class="results-summary">
+                <div class="results-severity" id="severity-level"></div>
+                <p id="results-text"></p>
+            </div>
+        
+            <!-- Graphical Representation -->
+            <div class="results-graph">
+                <h2>Category Breakdown</h2>
+                <canvas id="resultsChart" width="400" height="200"></canvas>
+            </div>
+        
+            <!-- Recommendations Section -->
+            <div class="recommendations">
+                <h2>Self-Care Recommendations</h2>
+                <ul id="recommendations-list"></ul>
+            </div>
+        
+            
+            <!-- Back to Assessments Button -->
+            <a href="/Mental-Health-Assessments.html" class="minimal-button">Back to Assessments</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Questions categorized by type from the social anxiety assessment document
+        const questions = [
+            // Fear of Social Interactions
+            {
+                text: "How nervous do you feel when meeting new people?",
+                category: "Fear of Social Interactions"
+            },
+            {
+                text: "Do you avoid making eye contact in social settings?",
+                category: "Fear of Social Interactions"
+            },
+            {
+                text: "How often do you fear being judged in conversations?",
+                category: "Fear of Social Interactions"
+            },
+            
+            // Self-Confidence in Social Situations
+            {
+                text: "Do you feel comfortable starting a conversation with a stranger?",
+                category: "Self-Confidence in Social Situations"
+            },
+            {
+                text: "Do you believe you have good social skills?",
+                category: "Self-Confidence in Social Situations" 
+            },
+            {
+                text: "How confident are you in expressing your opinions in a group?",
+                category: "Self-Confidence in Social Situations"
+            },
+            
+            // Avoidance Behaviors
+            {
+                text: "Do you avoid attending social gatherings even when you want to go?",
+                category: "Avoidance Behaviors"
+            },
+            {
+                text: "How often do you overthink a past conversation, worrying about what you said?",
+                category: "Avoidance Behaviors"
+            },
+            {
+                text: "Do you prefer texting over face-to-face or phone conversations?",
+                category: "Avoidance Behaviors"
+            },
+            
+            // Impact on Daily Life
+            {
+                text: "Do you feel physically uncomfortable (sweating, shaking, rapid heartbeat) in social situations?",
+                category: "Impact on Daily Life"
+            },
+            {
+                text: "Do you turn down opportunities (e.g., job interviews, speaking events) due to social fear?",
+                category: "Impact on Daily Life"
+            },
+            {
+                text: "How much does social anxiety impact your relationships or career?",
+                category: "Impact on Daily Life"
+            }
+        ];
+
+        // Categorize questions for the report
+        const categories = {
+            "Fear of Social Interactions": [0, 1, 2],
+            "Self-Confidence in Social Situations": [3, 4, 5],
+            "Avoidance Behaviors": [6, 7, 8],
+            "Impact on Daily Life": [9, 10, 11]
+        };
+
+        // Recommendations based on score ranges from the social anxiety assessment document
+        const recommendationsByLevel = {
+            "low": [
+                "Maintain and enhance confidence-building habits",
+                "Continue engaging in social activities",
+                "Practice regular self-reflection to sustain confidence",
+                "Share your successful strategies with others who might benefit"
+            ],
+            "mild": [
+                "Practice mindfulness before social interactions",
+                "Use affirmations to boost confidence",
+                "Prepare conversation starters before social events",
+                "Gradually increase participation in group discussions"
+            ],
+            "moderate": [
+                "Exposure therapy: Gradually engage in more social activities",
+                "Cognitive Behavioral Therapy (CBT) techniques to challenge negative thoughts",
+                "Regular journaling to identify anxiety triggers",
+                "Join interest-based groups where socializing is secondary to activities"
+            ],
+            "high": [
+                "Structured confidence-building exercises",
+                "Consider social skills training or group therapy",
+                "Implement daily anxiety management techniques",
+                "Develop a personalized exposure hierarchy with progressive challenges"
+            ],
+            "severe": [
+                "Seek professional guidance for therapy",
+                "Join support groups for social anxiety management",
+                "Gradual desensitization through guided exposure",
+                "Consider consulting with a healthcare provider about treatment options",
+                "Implement daily anxiety-management techniques with professional guidance"
+            ]
+        };
+
+        let currentQuestion = 0;
+        let answers = new Array(questions.length).fill(null);
+
+        const quiz = document.querySelector('.quiz');
+        const results = document.querySelector('.results');
+        const categoryLabel = document.getElementById('category-label');
+        const questionText = document.getElementById('question-text');
+        const progressBar = document.querySelector('.progress-bar');
+        const options = document.querySelectorAll('.option');
+        const prevButton = document.getElementById('prev');
+        const nextButton = document.getElementById('next');
+
+        function updateQuestion() {
+            const question = questions[currentQuestion];
+            categoryLabel.textContent = question.category;
+            questionText.textContent = `${currentQuestion + 1}. ${question.text}`;
+            progressBar.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            prevButton.disabled = currentQuestion === 0;
+            nextButton.textContent = currentQuestion === questions.length - 1 ? 'Finish' : 'Next';
+
+            options.forEach(option => {
+                option.classList.remove('selected');
+                if (answers[currentQuestion] === parseInt(option.dataset.value)) {
+                    option.classList.add('selected');
+                }
+            });
+        }
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                options.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                answers[currentQuestion] = parseInt(option.dataset.value);
+            });
+        });
+
+        prevButton.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                updateQuestion();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (answers[currentQuestion] === null) {
+                alert('Please select an answer before proceeding.');
+                return;
+            }
+
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                updateQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        function showResults() {
+            quiz.style.display = 'none';
+            results.style.display = 'block';
+
+            const totalScore = answers.reduce((sum, val) => sum + val, 0);
+            const maxScore = questions.length * 3; // Maximum possible score (scale: 0-3)
+            
+            // Calculate category scores for detailed analysis
+            const categoryScores = {};
+            for (const [category, indices] of Object.entries(categories)) {
+                const sum = indices.reduce((acc, index) => acc + answers[index], 0);
+                const maxPossible = indices.length * 3;
+                categoryScores[category] = {
+                    score: sum,
+                    percentage: (sum / maxPossible) * 100
+                };
+            }
+            
+            let anxietyLevel = '';
+            let levelClass = '';
+            let resultText = '';
+            let recommendations = [];
+
+            // Determine anxiety level according to the scoring system from the document
+            if (totalScore <= 5) {
+                anxietyLevel = 'Low social anxiety, high confidence';
+                levelClass = 'low';
+                resultText = `Your responses indicate low levels of social anxiety and high confidence (Score: ${totalScore}/${maxScore}).`;
+                recommendations = recommendationsByLevel.low;
+            } else if (totalScore <= 10) {
+                anxietyLevel = 'Mild social anxiety';
+                levelClass = 'mild';
+                resultText = `Your responses suggest mild social anxiety (Score: ${totalScore}/${maxScore}).`;
+                recommendations = recommendationsByLevel.mild;
+            } else if (totalScore <= 15) {
+                anxietyLevel = 'Moderate social anxiety';
+                levelClass = 'moderate';
+                resultText = `Your responses indicate moderate social anxiety (Score: ${totalScore}/${maxScore}).`;
+                recommendations = recommendationsByLevel.moderate;
+            } else if (totalScore <= 21) {
+                anxietyLevel = 'High social anxiety';
+                levelClass = 'high';
+                resultText = `Your responses suggest high social anxiety (Score: ${totalScore}/${maxScore}).`;
+                recommendations = recommendationsByLevel.high;
+            } else {
+                anxietyLevel = 'Severe social anxiety (Professional support recommended)';
+                levelClass = 'severe';
+                resultText = `Your responses indicate severe social anxiety symptoms (Score: ${totalScore}/${maxScore}).`;
+                recommendations = recommendationsByLevel.severe;
+            }
+
+            // Add highest category insights to the result text
+            let highestCategory = '';
+            let highestScore = -1;
+            
+            for (const [category, data] of Object.entries(categoryScores)) {
+                if (data.percentage > highestScore) {
+                    highestScore = data.percentage;
+                    highestCategory = category;
+                }
+            }
+            
+            resultText += `<br><br>Your results show that <strong>${highestCategory}</strong> is your primary area of concern with a score that is ${Math.round(highestScore)}% of the maximum for that category.`;
+            
+            // Add category insights to the result text
+            resultText += "<br><br><strong>Category Analysis:</strong>";
+            for (const [category, data] of Object.entries(categoryScores)) {
+                resultText += `<br>• ${category}: ${data.score} (${Math.round(data.percentage)}%)`;
+            }
+
+            document.getElementById('severity-level').textContent = anxietyLevel;
+            document.getElementById('severity-level').className = `results-severity ${levelClass}`;
+            document.getElementById('results-text').innerHTML = resultText;
+            document.getElementById('recommendations-list').innerHTML =
+                recommendations.map(rec => `<li>${rec}</li>`).join('');
+
+            // Create data for the chart
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryScores),
+                    datasets: [{
+                        label: 'Category Scores',
+                        data: Object.values(categoryScores).map(cat => cat.score),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',   // Fear - Pink/Red
+                            'rgba(54, 162, 235, 0.6)',   // Self-Confidence - Blue
+                            'rgba(255, 206, 86, 0.6)',   // Avoidance - Yellow
+                            'rgba(75, 192, 192, 0.6)'    // Impact - Teal
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true },
+                        tooltip: { 
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const categoryName = context.label;
+                                    const score = context.raw;
+                                    const maxScore = categories[categoryName].length * 3;
+                                    return `${categoryName}: ${score}/${maxScore} (${Math.round((score/maxScore)*100)}%)`;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: `Social Anxiety Level: ${anxietyLevel} (${totalScore}/${maxScore})`
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize the first question
+        updateQuestion();
+    </script>
+</body>
+</html>

@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindful Explorer - ADHD Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: #fafafa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #ebf8ff;
+            color: #2b6cb0;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .progress {
+            height: 4px;
+            background: #edf2f7;
+            margin: 1.5rem 0;
+            border-radius: 2px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #4a5568;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            margin: 2rem 0;
+        }
+
+        .category-label {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: #2d3748;
+        }
+
+        .options {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .option {
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option:hover {
+            background: #f7fafc;
+        }
+
+        .option.selected {
+            background: #2d3748;
+            color: white;
+            border-color: #2d3748;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        button {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-next {
+            background: #2d3748;
+            color: white;
+        }
+
+        .btn-prev {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results-summary {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+        }
+
+        .results-severity {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+
+        .unlikely { color: #38a169; }
+        .mild { color: #d69e2e; }
+        .moderate { color: #dd6b20; }
+        .high { color: #e53e3e; }
+
+        .insights {
+            margin: 1.5rem 0;
+        }
+
+        .insights li {
+            margin: 0.5rem 0;
+            margin-left: 1.5rem;
+        }
+        
+        .results-graph {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .results-graph h2 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .minimal-button {
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: 200;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem 1.5rem;
+            border: 2px solid #333333;
+            border-radius: 5px;
+            background-color: #333333;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .minimal-button:hover {
+            background-color: #555555;
+            border-color: #555555;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            button {
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="quiz">
+            <h1>Mindful Explorer - ADHD Test</h1>
+            <p class="description">This assessment is designed to help individuals explore their potential ADHD symptoms and provide insights for self-reflection.</p>
+            <div>
+                <span class="badge">Adult ADHD Self-Report Scale</span>
+                <span class="badge">Conners' Adult ADHD Rating Scales</span>
+                <span class="badge">DSM-5 ADHD Criteria</span>
+            </div>
+            
+            <div class="progress">
+                <div class="progress-bar" style="width: 0%"></div>
+            </div>
+
+            <div class="question">
+                <div class="category-label" id="category-label"></div>
+                <div class="question-text" id="question-text"></div>
+                <div class="options">
+                    <div class="option" data-value="0"></div>
+                    <div class="option" data-value="1"></div>
+                    <div class="option" data-value="2"></div>
+                    <div class="option" data-value="3"></div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn-prev" id="prev" disabled>Previous</button>
+                <button class="btn-next" id="next">Next</button>
+            </div>
+        </div>
+
+        <div class="results" style="display: none;">
+            <h1>Your ADHD Test Results</h1>
+        
+            <!-- Results Summary -->
+            <div class="results-summary">
+                <div class="results-severity" id="severity-level"></div>
+                <p id="results-text"></p>
+            </div>
+        
+            <!-- Graphical Representation -->
+            <div class="results-graph">
+                <h2>Category Breakdown</h2>
+                <canvas id="resultsChart" width="400" height="200"></canvas>
+            </div>
+        
+            <!-- Insights Section -->
+            <div class="insights">
+                <h2>Self-Care Recommendations</h2>
+                <ul id="insights-list"></ul>
+            </div>
+        
+            
+            <!-- Back to Assessments Button -->
+            <a href="/Mental-Health-Assessments.html" class="minimal-button">Back to Assessments</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Questions categorized by type for the ADHD test
+        const questions = [
+            // Inattention & Focus
+            {
+                text: "How often do you have difficulty sustaining attention on tasks (e.g., reading, working, conversations)?",
+                category: "Inattention & Focus",
+                options: [
+                    "Never",
+                    "Occasionally",
+                    "Often",
+                    "Very often"
+                ]
+            },
+            {
+                text: "Do you frequently make careless mistakes in work, school, or daily activities?",
+                category: "Inattention & Focus",
+                options: [
+                    "Never",
+                    "Sometimes",
+                    "Often",
+                    "Very often"
+                ]
+            },
+            {
+                text: "How often do you find yourself zoning out or daydreaming when trying to focus?",
+                category: "Inattention & Focus",
+                options: [
+                    "Never",
+                    "Sometimes",
+                    "Often",
+                    "Very often"
+                ]
+            },
+            
+            // Hyperactivity & Impulsivity
+            {
+                text: "Do you frequently feel the need to move (e.g., tapping, fidgeting, leg bouncing)?",
+                category: "Hyperactivity & Impulsivity",
+                options: [
+                    "Never",
+                    "Occasionally",
+                    "Often",
+                    "Very often"
+                ]
+            },
+            {
+                text: "Do you speak out or interrupt others before they finish speaking?",
+                category: "Hyperactivity & Impulsivity",
+                options: [
+                    "Never",
+                    "Occasionally",
+                    "Often",
+                    "Very often"
+                ]
+            },
+            {
+                text: "How often do you struggle to sit still in meetings, social gatherings, or classrooms?",
+                category: "Hyperactivity & Impulsivity",
+                options: [
+                    "Never",
+                    "Occasionally",
+                    "Often",
+                    "Very often"
+                ]
+            },
+            
+            // Executive Functioning & Organization
+            {
+                text: "Do you have trouble organizing tasks or managing time effectively?",
+                category: "Executive Functioning & Organization",
+                options: [
+                    "Never",
+                    "Occasionally",
+                    "Often",
+                    "Very often"
+                ]
+            },
+            {
+                text: "How often do you forget appointments, deadlines, or daily responsibilities?",
+                category: "Executive Functioning & Organization",
+                options: [
+                    "Never",
+                    "Occasionally",
+                    "Often",
+                    "Very often"
+                ]
+            },
+            {
+                text: "Do you procrastinate on important tasks, even when you know they need to be done?",
+                category: "Executive Functioning & Organization",
+                options: [
+                    "Never",
+                    "Occasionally",
+                    "Often",
+                    "Very often"
+                ]
+            },
+            
+            // Emotional Regulation & Daily Impact
+            {
+                text: "How often do you experience frustration, irritability, or mood swings?",
+                category: "Emotional Regulation & Daily Impact",
+                options: [
+                    "Never",
+                    "Occasionally",
+                    "Often",
+                    "Very often"
+                ]
+            },
+            {
+                text: "Do you struggle with feeling overwhelmed by daily responsibilities?",
+                category: "Emotional Regulation & Daily Impact",
+                options: [
+                    "Never",
+                    "Occasionally",
+                    "Often",
+                    "Very often"
+                ]
+            },
+            {
+                text: "Do you find it hard to relax, even when you have free time?",
+                category: "Emotional Regulation & Daily Impact",
+                options: [
+                    "Never",
+                    "Occasionally",
+                    "Often",
+                    "Very often"
+                ]
+            }
+        ];
+
+        // Categorize questions for the report
+        const categories = {
+            "Inattention & Focus": [0, 1, 2],
+            "Hyperactivity & Impulsivity": [3, 4, 5],
+            "Executive Functioning & Organization": [6, 7, 8],
+            "Emotional Regulation & Daily Impact": [9, 10, 11]
+        };
+
+        // Self-care recommendations based on score ranges
+        const insightsBySeverity = {
+            "unlikely": [
+                "Maintain a balanced schedule with good sleep and exercise habits.",
+                "Continue practicing mindfulness and stress management techniques.",
+                "Check in with yourself periodically to monitor any changes in attention or focus."
+            ],
+            "mild": [
+                "Use planners, alarms, and reminders to stay organized.",
+                "Try mindfulness techniques to improve focus.",
+                "Consider setting up structured work environments with minimal distractions.",
+                "Break large tasks into smaller, manageable chunks."
+            ],
+            "moderate": [
+                "Experiment with structured routines and time management techniques.",
+                "Reduce distractions by using noise-canceling headphones or focus apps.",
+                "Break tasks into smaller steps to avoid overwhelm.",
+                "Consider regular exercise to help manage hyperactivity and improve focus.",
+                "Explore working with an ADHD coach or therapist for personalized strategies."
+            ],
+            "high": [
+                "Consider seeking professional evaluation from a psychologist or psychiatrist.",
+                "Explore therapy options like Cognitive Behavioral Therapy (CBT).",
+                "Medication and lifestyle adjustments may help manage symptoms effectively.",
+                "Join support groups to connect with others who share similar experiences.",
+                "Work with professionals to develop personalized coping strategies for your specific challenges."
+            ]
+        };
+
+        let currentQuestion = 0;
+        let answers = new Array(questions.length).fill(null);
+
+        const quiz = document.querySelector('.quiz');
+        const results = document.querySelector('.results');
+        const categoryLabel = document.getElementById('category-label');
+        const questionText = document.getElementById('question-text');
+        const progressBar = document.querySelector('.progress-bar');
+        const options = document.querySelectorAll('.option');
+        const prevButton = document.getElementById('prev');
+        const nextButton = document.getElementById('next');
+
+        function updateQuestion() {
+            const question = questions[currentQuestion];
+            categoryLabel.textContent = question.category;
+            questionText.textContent = `${currentQuestion + 1}. ${question.text}`;
+            progressBar.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            prevButton.disabled = currentQuestion === 0;
+            nextButton.textContent = currentQuestion === questions.length - 1 ? 'Finish' : 'Next';
+
+            // Update options text
+            options.forEach((option, index) => {
+                option.textContent = question.options[index];
+                option.classList.remove('selected');
+                if (answers[currentQuestion] === parseInt(option.dataset.value)) {
+                    option.classList.add('selected');
+                }
+            });
+        }
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                options.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                answers[currentQuestion] = parseInt(option.dataset.value);
+            });
+        });
+
+        prevButton.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                updateQuestion();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (answers[currentQuestion] === null) {
+                alert('Please select an answer before proceeding.');
+                return;
+            }
+
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                updateQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        function showResults() {
+            quiz.style.display = 'none';
+            results.style.display = 'block';
+
+            const totalScore = answers.reduce((sum, val) => sum + val, 0);
+            const maxScore = questions.length * 3; // Maximum possible score (scale: 0-3)
+            
+            // Calculate category scores for detailed analysis
+            const categoryScores = {};
+            for (const [category, indices] of Object.entries(categories)) {
+                const sum = indices.reduce((acc, index) => acc + answers[index], 0);
+                const maxPossible = indices.length * 3;
+                categoryScores[category] = {
+                    score: sum,
+                    percentage: (sum / maxPossible) * 100
+                };
+            }
+            
+            let severityLevel = '';
+            let levelClass = '';
+            let resultText = '';
+            let insights = [];
+
+            // Determine ADHD severity level according to the scoring system
+            if (totalScore <= 9) {
+                severityLevel = 'Unlikely ADHD symptoms';
+                levelClass = 'unlikely';
+                resultText = `Your responses indicate symptoms unlikely to be ADHD (Score: ${totalScore}/${maxScore}).`;
+                insights = insightsBySeverity["unlikely"];
+            } else if (totalScore <= 19) {
+                severityLevel = 'Mild ADHD traits';
+                levelClass = 'mild';
+                resultText = `Your responses suggest mild ADHD traits (Score: ${totalScore}/${maxScore}).`;
+                insights = insightsBySeverity["mild"];
+            } else if (totalScore <= 29) {
+                severityLevel = 'Moderate ADHD symptoms';
+                levelClass = 'moderate';
+                resultText = `Your responses indicate moderate ADHD symptoms (Score: ${totalScore}/${maxScore}).`;
+                insights = insightsBySeverity["moderate"];
+            } else {
+                severityLevel = 'High likelihood of ADHD';
+                levelClass = 'high';
+                resultText = `Your responses indicate a high likelihood of ADHD (Score: ${totalScore}/${maxScore}). Professional evaluation is recommended.`;
+                insights = insightsBySeverity["high"];
+            }
+
+            // Add highest category insights to the result text
+            let highestCategory = '';
+            let highestScore = -1;
+            
+            for (const [category, data] of Object.entries(categoryScores)) {
+                if (data.percentage > highestScore) {
+                    highestScore = data.percentage;
+                    highestCategory = category;
+                }
+            }
+            
+            resultText += `<br><br>Your results show that <strong>${highestCategory}</strong> is your strongest indicator with a score that is ${Math.round(highestScore)}% of the maximum for that category.`;
+            
+            // Add category insights to the result text
+            resultText += "<br><br><strong>Category Analysis:</strong>";
+            for (const [category, data] of Object.entries(categoryScores)) {
+                resultText += `<br>• ${category}: ${data.score} (${Math.round(data.percentage)}%)`;
+            }
+
+            document.getElementById('severity-level').textContent = severityLevel;
+            document.getElementById('severity-level').className = `results-severity ${levelClass}`;
+            document.getElementById('results-text').innerHTML = resultText;
+            document.getElementById('insights-list').innerHTML =
+                insights.map(insight => `<li>${insight}</li>`).join('');
+
+            // Create data for the chart
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryScores),
+                    datasets: [{
+                        label: 'Category Scores (%)',
+                        data: Object.values(categoryScores).map(cat => cat.percentage),
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.6)',   // Inattention & Focus - Blue
+                            'rgba(255, 99, 132, 0.6)',   // Hyperactivity & Impulsivity - Pink/Red
+                            'rgba(255, 206, 86, 0.6)',   // Executive Functioning - Yellow
+                            'rgba(75, 192, 192, 0.6)'    // Emotional Regulation - Teal
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Percentage of Maximum Score'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { 
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const categoryName = context.label;
+                                    const percentage = context.raw.toFixed(1);
+                                    const indices = categories[categoryName];
+                                    const score = indices.reduce((acc, index) => acc + answers[index], 0);
+                                    const maxScore = indices.length * 3;
+                                    return `${categoryName}: ${score}/${maxScore} (${percentage}%)`;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: `ADHD Symptom Profile: ${severityLevel} (${totalScore}/${maxScore})`
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize the first question
+        updateQuestion();
+    </script>
+</body>
+</html>

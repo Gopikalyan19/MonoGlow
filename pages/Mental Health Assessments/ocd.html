@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindful Explorer - OCD (Obsessive-Compulsive Disorder) Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: #fafafa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #ebf8ff;
+            color: #2b6cb0;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .progress {
+            height: 4px;
+            background: #edf2f7;
+            margin: 1.5rem 0;
+            border-radius: 2px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #4a5568;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            margin: 2rem 0;
+        }
+
+        .category-label {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: #2d3748;
+        }
+
+        .options {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .option {
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option:hover {
+            background: #f7fafc;
+        }
+
+        .option.selected {
+            background: #2d3748;
+            color: white;
+            border-color: #2d3748;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        button {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-next {
+            background: #2d3748;
+            color: white;
+        }
+
+        .btn-prev {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results-summary {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+        }
+
+        .results-severity {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+
+        .minimal { color: #38a169; }
+        .mild { color: #3182ce; }
+        .moderate { color: #dd6b20; }
+        .marked { color: #e53e3e; }
+        .severe { color: #822727; }
+
+        .recommendations {
+            margin: 1.5rem 0;
+        }
+
+        .recommendations li {
+            margin: 0.5rem 0;
+            margin-left: 1.5rem;
+        }
+        
+        .results-graph {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .results-graph h2 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .minimal-button {
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: 200;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem 1.5rem;
+            border: 2px solid #333333;
+            border-radius: 5px;
+            background-color: #333333;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .minimal-button:hover {
+            background-color: #555555;
+            border-color: #555555;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            button {
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="quiz">
+            <h1>Mindful Explorer - OCD (Obsessive-Compulsive Disorder) Assessment</h1>
+            <p class="description">Based on validated psychological scales including Yale-Brown Obsessive-Compulsive Scale (Y-BOCS), Obsessive-Compulsive Inventory - Revised (OCI-R), and Dimensional Obsessive-Compulsive Scale (DOCS).</p>
+            <div>
+                <span class="badge">Y-BOCS</span>
+                <span class="badge">OCI-R</span>
+                <span class="badge">DOCS</span>
+            </div>
+            
+            <div class="progress">
+                <div class="progress-bar" style="width: 0%"></div>
+            </div>
+
+            <div class="question">
+                <div class="category-label" id="category-label"></div>
+                <div class="question-text" id="question-text"></div>
+                <div class="options">
+                    <div class="option" data-value="0">Not at all</div>
+                    <div class="option" data-value="1">Slightly</div>
+                    <div class="option" data-value="2">Moderately</div>
+                    <div class="option" data-value="3">Very much</div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn-prev" id="prev" disabled>Previous</button>
+                <button class="btn-next" id="next">Next</button>
+            </div>
+        </div>
+
+        <div class="results" style="display: none;">
+            <h1>Your OCD Assessment Results</h1>
+        
+            <!-- Results Summary -->
+            <div class="results-summary">
+                <div class="results-severity" id="severity-level"></div>
+                <p id="results-text"></p>
+            </div>
+        
+            <!-- Graphical Representation -->
+            <div class="results-graph">
+                <h2>Category Breakdown</h2>
+                <canvas id="resultsChart" width="400" height="200"></canvas>
+            </div>
+        
+            <!-- Recommendations Section -->
+            <div class="recommendations">
+                <h2>Self-Care Recommendations</h2>
+                <ul id="recommendations-list"></ul>
+            </div>
+        
+            
+            <!-- Back to Assessments Button -->
+            <a href="/Mental-Health-Assessments.html" class="minimal-button">Back to Assessments</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Questions categorized by type for the OCD assessment
+        const questions = [
+            // Obsessive Thoughts
+            {
+                text: "How often do you experience unwanted thoughts that cause anxiety or distress?",
+                category: "Obsessive Thoughts"
+            },
+            {
+                text: "How much time do you spend on these unwanted thoughts each day?",
+                category: "Obsessive Thoughts"
+            },
+            {
+                text: "How difficult is it to dismiss or redirect these thoughts when they occur?",
+                category: "Obsessive Thoughts"
+            },
+            
+            // Compulsive Behaviors
+            {
+                text: "Do you feel compelled to perform certain behaviors or mental acts repeatedly?",
+                category: "Compulsive Behaviors"
+            },
+            {
+                text: "How much time do you spend on repetitive behaviors or rituals each day?",
+                category: "Compulsive Behaviors" 
+            },
+            {
+                text: "Do you feel anxious or distressed if prevented from completing rituals or routines?",
+                category: "Compulsive Behaviors"
+            },
+            
+            // Distress & Interference in Daily Life
+            {
+                text: "How much do these thoughts and behaviors interfere with your work or studies?",
+                category: "Distress & Interference in Daily Life"
+            },
+            {
+                text: "Do these symptoms impact your social relationships or family life?",
+                category: "Distress & Interference in Daily Life"
+            },
+            {
+                text: "How much emotional distress do your symptoms cause you?",
+                category: "Distress & Interference in Daily Life"
+            },
+            
+            // Control Over Thoughts & Actions
+            {
+                text: "How successful are you at stopping or controlling unwanted thoughts?",
+                category: "Control Over Thoughts & Actions"
+            },
+            {
+                text: "Can you resist performing compulsive behaviors when you try to?",
+                category: "Control Over Thoughts & Actions"
+            },
+            {
+                text: "How much control do you feel you have over your OCD symptoms overall?",
+                category: "Control Over Thoughts & Actions"
+            }
+        ];
+
+        // Categorize questions for the report
+        const categories = {
+            "Obsessive Thoughts": [0, 1, 2],
+            "Compulsive Behaviors": [3, 4, 5],
+            "Distress & Interference in Daily Life": [6, 7, 8],
+            "Control Over Thoughts & Actions": [9, 10, 11]
+        };
+
+        // Recommendations based on score ranges
+        const recommendationsByLevel = {
+            "minimal": [
+                "Continue monitoring any occasional intrusive thoughts",
+                "Maintain healthy stress management routines",
+                "Practice mindfulness to enhance awareness of thought patterns"
+            ],
+            "mild": [
+                "Learn about cognitive defusion techniques to reduce thought attachment",
+                "Implement simple exposure practices for mild anxieties",
+                "Develop structured daily routines to reduce uncertainty",
+                "Practice mindfulness meditation to increase awareness of thoughts"
+            ],
+            "moderate": [
+                "Consider exploring Exposure and Response Prevention (ERP) techniques",
+                "Implement consistent stress management strategies",
+                "Establish a regular mindfulness practice",
+                "Consider joining a support group for OCD"
+            ],
+            "marked": [
+                "Seek professional guidance for structured ERP therapy",
+                "Implement cognitive restructuring techniques for intrusive thoughts",
+                "Establish a daily routine for symptom management",
+                "Consider working with a therapist specialized in OCD treatment"
+            ],
+            "severe": [
+                "Consult with a mental health professional specialized in OCD",
+                "Consider comprehensive treatment options including therapy and possibly medication",
+                "Join an OCD support group for additional resources",
+                "Implement a daily structure with guidance from healthcare providers",
+                "Develop a specific crisis plan for high-anxiety moments"
+            ]
+        };
+
+        let currentQuestion = 0;
+        let answers = new Array(questions.length).fill(null);
+
+        const quiz = document.querySelector('.quiz');
+        const results = document.querySelector('.results');
+        const categoryLabel = document.getElementById('category-label');
+        const questionText = document.getElementById('question-text');
+        const progressBar = document.querySelector('.progress-bar');
+        const options = document.querySelectorAll('.option');
+        const prevButton = document.getElementById('prev');
+        const nextButton = document.getElementById('next');
+
+        function updateQuestion() {
+            const question = questions[currentQuestion];
+            categoryLabel.textContent = question.category;
+            questionText.textContent = `${currentQuestion + 1}. ${question.text}`;
+            progressBar.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            prevButton.disabled = currentQuestion === 0;
+            nextButton.textContent = currentQuestion === questions.length - 1 ? 'Finish' : 'Next';
+
+            options.forEach(option => {
+                option.classList.remove('selected');
+                if (answers[currentQuestion] === parseInt(option.dataset.value)) {
+                    option.classList.add('selected');
+                }
+            });
+        }
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                options.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                answers[currentQuestion] = parseInt(option.dataset.value);
+            });
+        });
+
+        prevButton.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                updateQuestion();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (answers[currentQuestion] === null) {
+                alert('Please select an answer before proceeding.');
+                return;
+            }
+
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                updateQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        function showResults() {
+            quiz.style.display = 'none';
+            results.style.display = 'block';
+
+            const totalScore = answers.reduce((sum, val) => sum + val, 0);
+            const maxScore = questions.length * 3; // Maximum possible score (scale: 0-3)
+            
+            // Calculate category scores for detailed analysis
+            const categoryScores = {};
+            for (const [category, indices] of Object.entries(categories)) {
+                const sum = indices.reduce((acc, index) => acc + answers[index], 0);
+                const maxPossible = indices.length * 3;
+                categoryScores[category] = {
+                    score: sum,
+                    percentage: (sum / maxPossible) * 100
+                };
+            }
+            
+            let ocdLevel = '';
+            let levelClass = '';
+            let resultText = '';
+            let recommendations = [];
+
+            // Determine OCD severity level according to the scoring system
+            if (totalScore <= 5) {
+                ocdLevel = 'Minimal OCD Symptoms';
+                levelClass = 'minimal';
+                resultText = `Your responses indicate minimal OCD symptoms (Score: ${totalScore}/${maxScore}).`;
+                recommendations = recommendationsByLevel.minimal;
+            } else if (totalScore <= 10) {
+                ocdLevel = 'Mild OCD Symptoms';
+                levelClass = 'mild';
+                resultText = `Your responses suggest mild OCD symptoms (Score: ${totalScore}/${maxScore}).`;
+                recommendations = recommendationsByLevel.mild;
+            } else if (totalScore <= 15) {
+                ocdLevel = 'Moderate OCD Symptoms';
+                levelClass = 'moderate';
+                resultText = `Your responses indicate moderate OCD symptoms (Score: ${totalScore}/${maxScore}).`;
+                recommendations = recommendationsByLevel.moderate;
+            } else if (totalScore <= 21) {
+                ocdLevel = 'Marked OCD Symptoms';
+                levelClass = 'marked';
+                resultText = `Your responses suggest marked OCD symptoms (Score: ${totalScore}/${maxScore}).`;
+                recommendations = recommendationsByLevel.marked;
+            } else {
+                ocdLevel = 'Severe OCD Symptoms (Professional Support Recommended)';
+                levelClass = 'severe';
+                resultText = `Your responses indicate severe OCD symptoms (Score: ${totalScore}/${maxScore}).`;
+                recommendations = recommendationsByLevel.severe;
+            }
+
+            // Add highest category insights to the result text
+            let highestCategory = '';
+            let highestScore = -1;
+            
+            for (const [category, data] of Object.entries(categoryScores)) {
+                if (data.percentage > highestScore) {
+                    highestScore = data.percentage;
+                    highestCategory = category;
+                }
+            }
+            
+            resultText += `<br><br>Your results show that <strong>${highestCategory}</strong> is your primary area of concern with a score that is ${Math.round(highestScore)}% of the maximum for that category.`;
+            
+            // Add category insights to the result text
+            resultText += "<br><br><strong>Category Analysis:</strong>";
+            for (const [category, data] of Object.entries(categoryScores)) {
+                resultText += `<br>• ${category}: ${data.score} (${Math.round(data.percentage)}%)`;
+            }
+
+            document.getElementById('severity-level').textContent = ocdLevel;
+            document.getElementById('severity-level').className = `results-severity ${levelClass}`;
+            document.getElementById('results-text').innerHTML = resultText;
+            document.getElementById('recommendations-list').innerHTML =
+                recommendations.map(rec => `<li>${rec}</li>`).join('');
+
+            // Create data for the chart
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryScores),
+                    datasets: [{
+                        label: 'Category Scores',
+                        data: Object.values(categoryScores).map(cat => cat.score),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',   // Obsessive Thoughts - Pink/Red
+                            'rgba(54, 162, 235, 0.6)',   // Compulsive Behaviors - Blue
+                            'rgba(255, 206, 86, 0.6)',   // Distress & Interference - Yellow
+                            'rgba(75, 192, 192, 0.6)'    // Control Over Thoughts - Teal
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true },
+                        tooltip: { 
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const categoryName = context.label;
+                                    const score = context.raw;
+                                    const maxScore = categories[categoryName].length * 3;
+                                    return `${categoryName}: ${score}/${maxScore} (${Math.round((score/maxScore)*100)}%)`;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: `OCD Symptom Level: ${ocdLevel} (${totalScore}/${maxScore})`
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize the first question
+        updateQuestion();
+    </script>
+</body>
+</html>

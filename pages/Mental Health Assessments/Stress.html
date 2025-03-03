@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindful Explorer - Stress & Burnout Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: #fafafa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #ebf8ff;
+            color: #2b6cb0;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .progress {
+            height: 4px;
+            background: #edf2f7;
+            margin: 1.5rem 0;
+            border-radius: 2px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #4a5568;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            margin: 2rem 0;
+        }
+
+        .category-label {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: #2d3748;
+        }
+
+        .options {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .option {
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option:hover {
+            background: #f7fafc;
+        }
+
+        .option.selected {
+            background: #2d3748;
+            color: white;
+            border-color: #2d3748;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        button {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-next {
+            background: #2d3748;
+            color: white;
+        }
+
+        .btn-prev {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results-summary {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+        }
+
+        .results-severity {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+
+        .minimal { color: #38a169; }
+        .mild { color: #3182ce; }
+        .moderate { color: #dd6b20; }
+        .high { color: #e53e3e; }
+        .severe { color: #822727; }
+
+        .recommendations {
+            margin: 1.5rem 0;
+        }
+
+        .recommendations li {
+            margin: 0.5rem 0;
+            margin-left: 1.5rem;
+        }
+        
+        .results-graph {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .results-graph h2 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .minimal-button {
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: 200;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem 1.5rem;
+            border: 2px solid #333333;
+            border-radius: 5px;
+            background-color: #333333;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .minimal-button:hover {
+            background-color: #555555;
+            border-color: #555555;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            button {
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="quiz">
+            <h1>Mindful Explorer - Stress & Burnout Assessment</h1>
+            <p class="description">Based on validated psychological scales including Perceived Stress Scale (PSS), Maslach Burnout Inventory (MBI), and Copenhagen Burnout Inventory (CBI).</p>
+            <div>
+                <span class="badge">PSS</span>
+                <span class="badge">MBI</span>
+                <span class="badge">CBI</span>
+            </div>
+            
+            <div class="progress">
+                <div class="progress-bar" style="width: 0%"></div>
+            </div>
+
+            <div class="question">
+                <div class="category-label" id="category-label"></div>
+                <div class="question-text" id="question-text"></div>
+                <div class="options">
+                    <div class="option" data-value="0">Never</div>
+                    <div class="option" data-value="1">Sometimes/Occasionally</div>
+                    <div class="option" data-value="2">Often/Frequently</div>
+                    <div class="option" data-value="3">Almost Always</div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn-prev" id="prev" disabled>Previous</button>
+                <button class="btn-next" id="next">Next</button>
+            </div>
+        </div>
+
+        <div class="results" style="display: none;">
+            <h1>Your Stress & Burnout Assessment Results</h1>
+        
+            <!-- Results Summary -->
+            <div class="results-summary">
+                <div class="results-severity" id="severity-level"></div>
+                <p id="results-text"></p>
+            </div>
+        
+            <!-- Graphical Representation -->
+            <div class="results-graph">
+                <h2>Category Breakdown</h2>
+                <canvas id="resultsChart" width="400" height="200"></canvas>
+            </div>
+        
+            <!-- Recommendations Section -->
+            <div class="recommendations">
+                <h2>Self-Care Recommendations</h2>
+                <ul id="recommendations-list"></ul>
+            </div>
+        
+            
+            <!-- Back to Assessments Button -->
+            <a href="/Mental-Health-Assessments.html" class="minimal-button">Back to Assessments</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Questions categorized by type from the stress & burnout assessment document
+        const questions = [
+            // Emotional Stress
+            {
+                text: "How often do you feel overwhelmed or unable to cope with daily responsibilities?",
+                category: "Emotional Stress"
+            },
+            {
+                text: "Do you experience frequent mood swings or irritability?",
+                category: "Emotional Stress"
+            },
+            {
+                text: "Do you feel emotionally exhausted or drained after daily tasks?",
+                category: "Emotional Stress"
+            },
+            
+            // Physical Stress & Fatigue
+            {
+                text: "Do you experience frequent headaches, muscle tension, or stomach issues due to stress?",
+                category: "Physical Stress & Fatigue"
+            },
+            {
+                text: "Do you feel constantly tired, even after sleeping well?",
+                category: "Physical Stress & Fatigue"
+            },
+            {
+                text: "Do you rely on caffeine, energy drinks, or stimulants to get through the day?",
+                category: "Physical Stress & Fatigue"
+            },
+            
+            // Cognitive & Behavioral Stress
+            {
+                text: "Do you have difficulty concentrating or making decisions?",
+                category: "Cognitive & Behavioral Stress"
+            },
+            {
+                text: "Do you overthink or constantly worry about things beyond your control?",
+                category: "Cognitive & Behavioral Stress"
+            },
+            {
+                text: "Do you engage in unhealthy coping mechanisms (e.g., smoking, overeating, alcohol)?",
+                category: "Cognitive & Behavioral Stress"
+            },
+            
+            // Work-Related Burnout
+            {
+                text: "Do you feel detached or emotionally numb about your work/studies?",
+                category: "Work-Related Burnout"
+            },
+            {
+                text: "Do you struggle to find motivation for work or personal projects?",
+                category: "Work-Related Burnout"
+            },
+            {
+                text: "Do you feel unappreciated or undervalued in your work environment?",
+                category: "Work-Related Burnout"
+            },
+            
+            // Impact on Daily Life
+            {
+                text: "How often do stress and burnout affect your relationships with family and friends?",
+                category: "Impact on Daily Life"
+            },
+            {
+                text: "Do you feel like you never have enough time for self-care or relaxation?",
+                category: "Impact on Daily Life"
+            },
+            {
+                text: "Do you feel like you're constantly in \"survival mode\" rather than enjoying life?",
+                category: "Impact on Daily Life"
+            }
+        ];
+
+        // Categorize questions for the report
+        const categories = {
+            "Emotional Stress": [0, 1, 2],
+            "Physical Stress & Fatigue": [3, 4, 5],
+            "Cognitive & Behavioral Stress": [6, 7, 8],
+            "Work-Related Burnout": [9, 10, 11],
+            "Impact on Daily Life": [12, 13, 14]
+        };
+
+        // Recommendations based on score ranges
+        const recommendationsByLevel = {
+            "minimal": [
+                "Maintain a balanced work-life routine",
+                "Engage in light stress-relief activities like deep breathing",
+                "Continue your current self-care practices",
+                "Schedule regular check-ins with yourself to monitor stress levels"
+            ],
+            "mild": [
+                "Practice time management and prioritize tasks",
+                "Incorporate relaxation techniques (e.g., meditation, stretching)",
+                "Set small daily goals that are achievable",
+                "Create boundaries between work and personal time"
+            ],
+            "moderate": [
+                "Establish clear boundaries between work and personal life",
+                "Engage in regular physical activity (e.g., yoga, walking)",
+                "Practice mindfulness meditation for 10-15 minutes daily",
+                "Consider talking to a trusted friend or colleague about your stress"
+            ],
+            "high": [
+                "Structured mindfulness or cognitive-based interventions",
+                "Seek peer support or professional guidance",
+                "Implement a strict work-life separation routine",
+                "Schedule mandatory self-care time in your calendar"
+            ],
+            "severe": [
+                "Immediate professional intervention is recommended",
+                "Consider lifestyle modifications and therapy for long-term relief",
+                "Emergency self-care measures like stress detox weekends",
+                "Work with a professional to develop a comprehensive recovery plan",
+                "Evaluate options for temporary work adjustments if possible"
+            ]
+        };
+
+        let currentQuestion = 0;
+        let answers = new Array(questions.length).fill(null);
+
+        const quiz = document.querySelector('.quiz');
+        const results = document.querySelector('.results');
+        const categoryLabel = document.getElementById('category-label');
+        const questionText = document.getElementById('question-text');
+        const progressBar = document.querySelector('.progress-bar');
+        const options = document.querySelectorAll('.option');
+        const prevButton = document.getElementById('prev');
+        const nextButton = document.getElementById('next');
+
+        function updateQuestion() {
+            const question = questions[currentQuestion];
+            categoryLabel.textContent = question.category;
+            questionText.textContent = `${currentQuestion + 1}. ${question.text}`;
+            progressBar.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            prevButton.disabled = currentQuestion === 0;
+            nextButton.textContent = currentQuestion === questions.length - 1 ? 'Finish' : 'Next';
+
+            options.forEach(option => {
+                option.classList.remove('selected');
+                if (answers[currentQuestion] === parseInt(option.dataset.value)) {
+                    option.classList.add('selected');
+                }
+            });
+        }
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                options.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                answers[currentQuestion] = parseInt(option.dataset.value);
+            });
+        });
+
+        prevButton.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                updateQuestion();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (answers[currentQuestion] === null) {
+                alert('Please select an answer before proceeding.');
+                return;
+            }
+
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                updateQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        function showResults() {
+            quiz.style.display = 'none';
+            results.style.display = 'block';
+
+            const totalScore = answers.reduce((sum, val) => sum + val, 0);
+            const maxScore = questions.length * 3; // Maximum possible score (scale: 0-3)
+            
+            // Calculate category scores for detailed analysis
+            const categoryScores = {};
+            for (const [category, indices] of Object.entries(categories)) {
+                const sum = indices.reduce((acc, index) => acc + answers[index], 0);
+                const maxPossible = indices.length * 3;
+                categoryScores[category] = {
+                    score: sum,
+                    percentage: (sum / maxPossible) * 100
+                };
+            }
+            
+            let stressLevel = '';
+            let levelClass = '';
+            let resultText = '';
+            let recommendations = [];
+
+            // Determine stress level according to the scoring system
+            if (totalScore <= 5) {
+                stressLevel = 'Minimal Stress & Burnout';
+                levelClass = 'minimal';
+                resultText = `Your responses indicate minimal stress and burnout symptoms (Score: ${totalScore}/${maxScore}).`;
+                recommendations = recommendationsByLevel.minimal;
+            } else if (totalScore <= 10) {
+                stressLevel = 'Mild Stress & Burnout';
+                levelClass = 'mild';
+                resultText = `Your responses suggest mild stress and burnout symptoms (Score: ${totalScore}/${maxScore}).`;
+                recommendations = recommendationsByLevel.mild;
+            } else if (totalScore <= 15) {
+                stressLevel = 'Moderate Stress & Burnout';
+                levelClass = 'moderate';
+                resultText = `Your responses indicate moderate stress and burnout symptoms (Score: ${totalScore}/${maxScore}).`;
+                recommendations = recommendationsByLevel.moderate;
+            } else if (totalScore <= 21) {
+                stressLevel = 'High Stress & Burnout';
+                levelClass = 'high';
+                resultText = `Your responses suggest high stress and burnout symptoms (Score: ${totalScore}/${maxScore}).`;
+                recommendations = recommendationsByLevel.high;
+            } else {
+                stressLevel = 'Severe Burnout (Immediate Intervention Needed)';
+                levelClass = 'severe';
+                resultText = `Your responses indicate severe burnout symptoms (Score: ${totalScore}/${maxScore}).`;
+                recommendations = recommendationsByLevel.severe;
+            }
+
+            // Add highest category insights to the result text
+            let highestCategory = '';
+            let highestScore = -1;
+            
+            for (const [category, data] of Object.entries(categoryScores)) {
+                if (data.percentage > highestScore) {
+                    highestScore = data.percentage;
+                    highestCategory = category;
+                }
+            }
+            
+            resultText += `<br><br>Your results show that <strong>${highestCategory}</strong> is your primary area of concern with a score that is ${Math.round(highestScore)}% of the maximum for that category.`;
+            
+            // Add category insights to the result text
+            resultText += "<br><br><strong>Category Analysis:</strong>";
+            for (const [category, data] of Object.entries(categoryScores)) {
+                resultText += `<br>• ${category}: ${data.score} (${Math.round(data.percentage)}%)`;
+            }
+
+            document.getElementById('severity-level').textContent = stressLevel;
+            document.getElementById('severity-level').className = `results-severity ${levelClass}`;
+            document.getElementById('results-text').innerHTML = resultText;
+            document.getElementById('recommendations-list').innerHTML =
+                recommendations.map(rec => `<li>${rec}</li>`).join('');
+
+            // Create data for the chart
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryScores),
+                    datasets: [{
+                        label: 'Category Scores',
+                        data: Object.values(categoryScores).map(cat => cat.score),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',  // Emotional - Pink/Red
+                            'rgba(54, 162, 235, 0.6)',  // Physical - Blue
+                            'rgba(255, 206, 86, 0.6)',  // Cognitive - Yellow
+                            'rgba(75, 192, 192, 0.6)',  // Work - Teal
+                            'rgba(153, 102, 255, 0.6)'  // Daily Life - Purple
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true },
+                        tooltip: { 
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const categoryName = context.label;
+                                    const score = context.raw;
+                                    const maxScore = categories[categoryName].length * 3;
+                                    return `${categoryName}: ${score}/${maxScore} (${Math.round((score/maxScore)*100)}%)`;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: `Stress & Burnout Level: ${stressLevel} (${totalScore}/${maxScore})`
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize the first question
+        updateQuestion();
+    </script>
+</body>
+</html>
