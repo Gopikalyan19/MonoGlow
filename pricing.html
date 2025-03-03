@@ -105,25 +105,39 @@
                   </li>
                 </ul>
                 <button id="pay-btn" class="inline-flex justify-center items-center text-center w-full h-16 p-5 font-semibold tracking-tight text-xl hover:text-white focus:text-white bg-transparent hover:bg-neutral-900 focus:bg-neutral-900 border border-neutral-900 rounded-lg focus:ring-4 focus:ring-neutral-400 transition duration-200">Pay Now</button>
-                <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-                <script>
-                document.getElementById("pay-btn").onclick = function () {
-                  var options = {
-                    key: "rzp_live_qbsDVJGOBqrt5Y", // Replace with your Razorpay Key ID
-                    amount: 2500, // ₹25 (2500 paise)
-                    currency: "INR",
-                    order_id: "order_Q2KT8NT2dydNbz", // Use the generated order ID
-                    name: "MonoGlow",
-                    description: "Test Transaction",
-                    handler: function (response) {
-                      alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
-                      window.location.href = "pages/Mental Health Assessments/Depression.html"; // Redirect after payment
-                    },
-                  };
-                  var rzp = new Razorpay(options);
-                  rzp.open();
-                };
-                </script>
+
+                  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+                  <script>
+                  document.getElementById("pay-btn").addEventListener("click", function() {
+                    var options = {
+                      key: "rzp_live_qbsDVJGOBqrt5Y", // Your Razorpay Key ID
+                      amount: 2500, // ₹25 (2500 paise)
+                      currency: "INR",
+                      order_id: "order_Q2KT8NT2dydNbz", // Order ID from your server
+                      name: "MonoGlow",
+                      description: "Test Transaction",
+                      handler: function(response) {
+                        alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
+                        window.location.href = "pages/Mental Health Assessments/Depression.html"; // Redirect after payment
+                      },
+                      prefill: {
+                        // Optional prefill information
+                        name: "",
+                        email: "",
+                        contact: ""
+                      },
+                      theme: {
+                        color: "#000000" // Change to match your website theme
+                      }
+                    };
+                    
+                    var rzp = new Razorpay(options);
+                    rzp.on('payment.failed', function(response) {
+                      alert("Payment Failed: " + response.error.description);
+                    });
+                    rzp.open();
+                  });
+                  </script>
               </div>
             </div>
             <div class="w-full md:w-1/2 xl:w-1/4 p-2">
