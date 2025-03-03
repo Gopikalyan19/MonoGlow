@@ -104,40 +104,109 @@
                     </div><span class="text-neutral-600 font-medium">Encourages upgrade</span>
                   </li>
                 </ul>
-                <button id="pay-btn" class="inline-flex justify-center items-center text-center w-full h-16 p-5 font-semibold tracking-tight text-xl hover:text-white focus:text-white bg-transparent hover:bg-neutral-900 focus:bg-neutral-900 border border-neutral-900 rounded-lg focus:ring-4 focus:ring-neutral-400 transition duration-200">Pay Now</button>
-
-                  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-                  <script>
-                  document.getElementById("pay-btn").addEventListener("click", function() {
-                    var options = {
-                      key: "rzp_live_qbsDVJGOBqrt5Y", // Your Razorpay Key ID
-                      amount: 2500, // ₹25 (2500 paise)
-                      currency: "INR",
-                      order_id: "order_Q2KT8NT2dydNbz", // Order ID from your server
-                      name: "MonoGlow",
-                      description: "Test Transaction",
-                      handler: function(response) {
-                        alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
-                        window.location.href = "pages/Mental Health Assessments/Depression.html"; // Redirect after payment
-                      },
-                      prefill: {
-                        // Optional prefill information
-                        name: "",
-                        email: "",
-                        contact: ""
-                      },
-                      theme: {
-                        color: "#000000" // Change to match your website theme
+                <style>
+                  .payment-button {
+                      display: inline-flex;
+                      justify-content: center;
+                      align-items: center;
+                      text-align: center;
+                      width: 100%;
+                      height: 4rem;
+                      padding: 1.25rem;
+                      font-weight: 600;
+                      font-size: 1.25rem;
+                      line-height: 1.5;
+                      color: #000;
+                      background-color: transparent;
+                      border: 1px solid #171717;
+                      border-radius: 0.5rem;
+                      transition: all 0.2s ease;
+                      cursor: pointer;
+                  }
+                  
+                  .payment-button:hover, .payment-button:focus {
+                      color: white;
+                      background-color: #171717;
+                  }
+                  
+                  .payment-button:focus {
+                      box-shadow: 0 0 0 0.25rem rgba(107, 114, 128, 0.5);
+                  }
+                  
+                  .payment-form {
+                      max-width: 500px;
+                      margin: 0 auto;
+                      padding: 2rem;
+                  }
+              </style>
+                <div class="payment-form">
+                  <form id="payment-form">
+                      <button id="pay-btn" type="button" class="payment-button">Pay Now</button>
+                  </form>
+              </div>
+              <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+              <script>
+                  // State object to store patient data
+                  const state = {
+                      patientData: {
+                          name: '', // Will be filled from your form or system
+                          email: '', // Will be filled from your form or system
+                          phone: ''  // Will be filled from your form or system
                       }
-                    };
-                    
-                    var rzp = new Razorpay(options);
-                    rzp.on('payment.failed', function(response) {
-                      alert("Payment Failed: " + response.error.description);
-                    });
-                    rzp.open();
+                  };
+                  
+                  // Utility functions
+                  const utils = {
+                      showError: function(message) {
+                          alert(message);
+                      }
+                  };
+                  
+                  // Handle successful payment
+                  function handlePaymentSuccess(paymentId) {
+                      alert("Payment Successful! Payment ID: " + paymentId);
+                      window.location.href = "pages/Mental Health Assessments/Depression.html";
+                  }
+          
+                  // Payment button click handler
+                  document.getElementById('pay-btn').addEventListener('click', function() {
+                      const options = {
+                          key: "rzp_live_qbsDVJGOBqrt5Y",
+                          amount: 100, // ₹1000 in paise (consultation booking price)
+                          currency: "INR",
+                          name: "MonoGlow",
+                          description: "",
+                          handler: function(response) {
+                              handlePaymentSuccess(response.razorpay_payment_id);
+                          },
+                          prefill: {
+                              name: state.patientData?.name || '',
+                              email: state.patientData?.email || '',
+                              contact: state.patientData?.phone || ''
+                          },
+                          theme: {
+                              color: "#3B82F6"
+                          }
+                      };
+                      
+                      try {
+                          const rzp = new Razorpay(options);
+                          rzp.on('payment.failed', function(response) {
+                              utils.showError("Payment Failed: " + response.error.description);
+                          });
+                          rzp.open();
+                      } catch (error) {
+                          utils.showError('Payment initialization failed. Please try again.');
+                      }
                   });
-                  </script>
+          
+                  // Form submission handler (if you need to collect data before payment)
+                  document.getElementById('payment-form').addEventListener('submit', function(e) {
+                      e.preventDefault();
+                      // You can add form validation or data collection here before triggering payment
+                      document.getElementById('pay-btn').click();
+                  });
+              </script>
               </div>
             </div>
             <div class="w-full md:w-1/2 xl:w-1/4 p-2">
