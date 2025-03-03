@@ -456,22 +456,22 @@
             let recommendations = [];
 
             // Determine OCD severity level according to the scoring system
-            if (totalScore <= 5) {
+            if (totalScore <= 10) {
                 ocdLevel = 'Minimal OCD Symptoms';
                 levelClass = 'minimal';
                 resultText = `Your responses indicate minimal OCD symptoms (Score: ${totalScore}/${maxScore}).`;
                 recommendations = recommendationsByLevel.minimal;
-            } else if (totalScore <= 10) {
+            } else if (totalScore <= 15) {
                 ocdLevel = 'Mild OCD Symptoms';
                 levelClass = 'mild';
                 resultText = `Your responses suggest mild OCD symptoms (Score: ${totalScore}/${maxScore}).`;
                 recommendations = recommendationsByLevel.mild;
-            } else if (totalScore <= 15) {
+            } else if (totalScore <= 20) {
                 ocdLevel = 'Moderate OCD Symptoms';
                 levelClass = 'moderate';
                 resultText = `Your responses indicate moderate OCD symptoms (Score: ${totalScore}/${maxScore}).`;
                 recommendations = recommendationsByLevel.moderate;
-            } else if (totalScore <= 21) {
+            } else if (totalScore <= 22) {
                 ocdLevel = 'Marked OCD Symptoms';
                 levelClass = 'marked';
                 resultText = `Your responses suggest marked OCD symptoms (Score: ${totalScore}/${maxScore}).`;

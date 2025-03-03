@@ -457,12 +457,12 @@
             let recommendations = [];
 
             // Determine anxiety level according to the scoring system from the document
-            if (totalScore <= 5) {
+            if (totalScore <= 10) {
                 anxietyLevel = 'Low social anxiety, high confidence';
                 levelClass = 'low';
                 resultText = `Your responses indicate low levels of social anxiety and high confidence (Score: ${totalScore}/${maxScore}).`;
                 recommendations = recommendationsByLevel.low;
-            } else if (totalScore <= 10) {
+            } else if (totalScore <= 12) {
                 anxietyLevel = 'Mild social anxiety';
                 levelClass = 'mild';
                 resultText = `Your responses suggest mild social anxiety (Score: ${totalScore}/${maxScore}).`;

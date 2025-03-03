@@ -447,22 +447,22 @@
             let recommendations = [];
 
             // Determine emotional well-being level according to the scoring system
-            if (totalScore <= 5) {
+            if (totalScore <= 10) {
                 wellBeingLevel = 'Excellent Emotional Well-Being';
                 levelClass = 'excellent';
                 resultText = `Your responses indicate excellent emotional well-being (Score: ${totalScore}/${maxScore}).`;
                 recommendations = recommendationsByLevel.excellent;
-            } else if (totalScore <= 10) {
+            } else if (totalScore <= 15) {
                 wellBeingLevel = 'Good Emotional Well-Being';
                 levelClass = 'good';
                 resultText = `Your responses suggest good emotional well-being (Score: ${totalScore}/${maxScore}).`;
                 recommendations = recommendationsByLevel.good;
-            } else if (totalScore <= 15) {
+            } else if (totalScore <= 20) {
                 wellBeingLevel = 'Moderate Emotional Challenges';
                 levelClass = 'moderate';
                 resultText = `Your responses indicate moderate emotional challenges (Score: ${totalScore}/${maxScore}).`;
                 recommendations = recommendationsByLevel.moderate;
-            } else if (totalScore <= 21) {
+            } else if (totalScore <= 22) {
                 wellBeingLevel = 'High Emotional Distress';
                 levelClass = 'high';
                 resultText = `Your responses suggest high emotional distress (Score: ${totalScore}/${maxScore}).`;

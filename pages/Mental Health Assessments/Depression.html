@@ -352,7 +352,7 @@
             let recommendations = [];
 
             // Determine depression level according to the scoring system
-            if (totalScore <= 5) {
+            if (totalScore <= 10) {
                 depressionLevel = 'Minimal Depression';
                 resultText = `Your responses indicate minimal depression symptoms (Score: ${totalScore}/${maxScore}).`;
                 recommendations = [
@@ -361,7 +361,7 @@
                     "Practice mindfulness during daily activities",
                     "Maintain your social connections and support network"
                 ];
-            } else if (totalScore <= 10) {
+            } else if (totalScore <= 15) {
                 depressionLevel = 'Mild Depression';
                 resultText = `Your responses suggest mild depression symptoms (Score: ${totalScore}/${maxScore}).`;
                 recommendations = [
@@ -370,7 +370,7 @@
                     "Establish a consistent exercise routine (even short walks help)",
                     "Schedule regular social interactions with supportive people"
                 ];
-            } else if (totalScore <= 15) {
+            } else if (totalScore <= 20) {
                 depressionLevel = 'Moderate Depression';
                 resultText = `Your responses indicate moderate depression symptoms (Score: ${totalScore}/${maxScore}).`;
                 recommendations = [
@@ -379,7 +379,7 @@
                     "Create a structured daily routine with achievable goals",
                     "Consider speaking with a mental health professional"
                 ];
-            } else if (totalScore <= 21) {
+            } else if (totalScore <= 22) {
                 depressionLevel = 'Severe Depression';
                 resultText = `Your responses suggest severe depression symptoms (Score: ${totalScore}/${maxScore}).`;
                 recommendations = [

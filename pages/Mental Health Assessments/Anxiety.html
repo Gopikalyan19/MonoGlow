@@ -349,7 +349,7 @@
             let recommendations = [];
 
             // Determine anxiety level according to the scoring system from document 2
-            if (totalScore <= 5) {
+            if (totalScore <= 10) {
                 anxietyLevel = 'Minimal Anxiety';
                 resultText = `Your responses indicate minimal anxiety symptoms (Score: ${totalScore}/${maxScore}).`;
                 recommendations = [
@@ -358,7 +358,7 @@
                     "Engage in enjoyable activities and hobbies",
                     "Maintain social connections and support systems"
                 ];
-            } else if (totalScore <= 10) {
+            } else if (totalScore <= 15) {
                 anxietyLevel = 'Mild Anxiety';
                 resultText = `Your responses suggest mild anxiety symptoms (Score: ${totalScore}/${maxScore}).`;
                 recommendations = [
@@ -367,7 +367,7 @@
                     "Maintain a regular sleep schedule",
                     "Consider limiting caffeine and alcohol intake"
                 ];
-            } else if (totalScore <= 15) {
+            } else if (totalScore <= 20) {
                 anxietyLevel = 'Moderate Anxiety';
                 resultText = `Your responses indicate moderate anxiety symptoms (Score: ${totalScore}/${maxScore}).`;
                 recommendations = [
@@ -376,7 +376,7 @@
                     "Establish a regular exercise routine",
                     "Consider speaking with a mental health professional"
                 ];
-            } else if (totalScore <= 21) {
+            } else if (totalScore <= 22) {
                 anxietyLevel = 'Severe Anxiety';
                 resultText = `Your responses suggest severe anxiety symptoms (Score: ${totalScore}/${maxScore}).`;
                 recommendations = [

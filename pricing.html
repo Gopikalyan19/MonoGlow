@@ -167,44 +167,50 @@
                       alert("Payment Successful! Payment ID: " + paymentId);
                       window.location.href = "pages/Mental Health Assessments/Depression.html";
                   }
-          
-                  // Payment button click handler
-                  document.getElementById('pay-btn').addEventListener('click', function() {
-                      const options = {
-                          key: "rzp_live_qbsDVJGOBqrt5Y",
-                          amount: 100, // ₹1000 in paise (consultation booking price)
-                          currency: "INR",
-                          name: "MonoGlow",
-                          description: "",
-                          handler: function(response) {
-                              handlePaymentSuccess(response.razorpay_payment_id);
-                          },
-                          prefill: {
-                              name: state.patientData?.name || '',
-                              email: state.patientData?.email || '',
-                              contact: state.patientData?.phone || ''
-                          },
-                          theme: {
-                              color: "#3B82F6"
+                  
+                  // Initialize payment when document is ready
+                  document.addEventListener('DOMContentLoaded', function() {
+                      // Payment button click handler
+                      document.getElementById('pay-btn').addEventListener('click', function() {
+                          const options = {
+                              key: "rzp_live_qbsDVJGOBqrt5Y",
+                              amount: 2500,
+                              currency: "INR",
+                              name: "MonoGlow",
+                              description: "",
+                              handler: function(response) {
+                                  handlePaymentSuccess(response.razorpay_payment_id);
+                              },
+                              prefill: {
+                                  name: state.patientData?.name || '',
+                                  email: state.patientData?.email || '',
+                                  contact: state.patientData?.phone || ''
+                              },
+                              theme: {
+                                  color: "#3B82F6"
+                              }
+                          };
+                          
+                          try {
+                              const rzp = new Razorpay(options);
+                              rzp.on('payment.failed', function(response) {
+                                  utils.showError("Payment Failed: " + response.error.description);
+                              });
+                              rzp.open();
+                          } catch (error) {
+                              utils.showError('Payment initialization failed. Please try again.');
                           }
-                      };
+                      });
                       
-                      try {
-                          const rzp = new Razorpay(options);
-                          rzp.on('payment.failed', function(response) {
-                              utils.showError("Payment Failed: " + response.error.description);
+                      // Form submission handler (if you need to collect data before payment)
+                      const paymentForm = document.getElementById('payment-form');
+                      if (paymentForm) {
+                          paymentForm.addEventListener('submit', function(e) {
+                              e.preventDefault();
+                              // You can add form validation or data collection here before triggering payment
+                              document.getElementById('pay-btn').click();
                           });
-                          rzp.open();
-                      } catch (error) {
-                          utils.showError('Payment initialization failed. Please try again.');
                       }
-                  });
-          
-                  // Form submission handler (if you need to collect data before payment)
-                  document.getElementById('payment-form').addEventListener('submit', function(e) {
-                      e.preventDefault();
-                      // You can add form validation or data collection here before triggering payment
-                      document.getElementById('pay-btn').click();
                   });
               </script>
               </div>

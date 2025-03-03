@@ -472,12 +472,12 @@
             let recommendations = [];
 
             // Determine stress level according to the scoring system
-            if (totalScore <= 5) {
+            if (totalScore <= 9) {
                 stressLevel = 'Minimal Stress & Burnout';
                 levelClass = 'minimal';
                 resultText = `Your responses indicate minimal stress and burnout symptoms (Score: ${totalScore}/${maxScore}).`;
                 recommendations = recommendationsByLevel.minimal;
-            } else if (totalScore <= 10) {
+            } else if (totalScore <= 12) {
                 stressLevel = 'Mild Stress & Burnout';
                 levelClass = 'mild';
                 resultText = `Your responses suggest mild stress and burnout symptoms (Score: ${totalScore}/${maxScore}).`;
