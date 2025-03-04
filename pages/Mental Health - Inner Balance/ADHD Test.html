@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inner Balance - ADHD Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: #fafafa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .progress {
+            height: 4px;
+            background: #edf2f7;
+            margin: 1.5rem 0;
+            border-radius: 2px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #4a5568;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            margin: 2rem 0;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: #2d3748;
+        }
+
+        .options {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .option {
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option:hover {
+            background: #f7fafc;
+        }
+
+        .option.selected {
+            background: #2d3748;
+            color: white;
+            border-color: #2d3748;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        button {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-next {
+            background: #2d3748;
+            color: white;
+        }
+
+        .btn-prev {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results-summary {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+        }
+
+        .recommendations {
+            margin: 1.5rem 0;
+        }
+
+        .recommendations li {
+            margin: 0.5rem 0;
+            margin-left: 1.5rem;
+        }
+        .results-graph {
+            margin-top: 20px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .results-graph h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .mood-tracker {
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding: 1.5rem;
+            background: #f7fafc;
+            border-radius: 6px;
+        }
+        
+        .email-form {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f0f5ff;
+            border-radius: 6px;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+        
+        .submit-btn {
+            background: #2d3748;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+            margin-top: 0.5rem;
+        }
+        
+        .submit-btn:hover {
+            background: #4a5568;
+        }
+        
+        .minimal-button {
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: 200;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem 1.5rem;
+            border: 2px solid #333333;
+            border-radius: 5px;
+            background-color: #333333;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .minimal-button:hover {
+            background-color: #555555;
+            border-color: #555555;
+        }
+
+        .sent-notification {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            button {
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="quiz">
+            <h1>Inner Balance - ADHD Assessment</h1>
+            <p class="description">This therapist-reviewed, advanced mental health assessment evaluates symptoms of Attention-Deficit/Hyperactivity Disorder (ADHD), assessing focus, hyperactivity, and impulsivity patterns.</p>
+            
+            <div class="progress">
+                <div class="progress-bar" style="width: 0%"></div>
+            </div>
+
+            <div class="question">
+                <div class="question-text" id="question-text"></div>
+                <div class="options">
+                    <div class="option" data-value="0">Rarely or never</div>
+                    <div class="option" data-value="1">Sometimes</div>
+                    <div class="option" data-value="2">Often</div>
+                    <div class="option" data-value="3">Almost always</div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn-prev" id="prev" disabled>Previous</button>
+                <button class="btn-next" id="next">Next</button>
+            </div>
+        </div>
+
+        <div class="results" style="display: none;">
+            <h1>Your ADHD Assessment Results</h1>
+        
+            <div class="results-summary">
+                <p id="results-text"></p>
+            </div>
+        
+            <div class="results-graph">
+                <h2>Category Breakdown</h2>
+                <canvas id="resultsChart" width="400" height="200"></canvas>
+            </div>
+            
+            <div class="results-graph">
+                <h2>ADHD Symptom Analysis</h2>
+                <p>This line graph visualizes your ADHD symptom variations based on your responses.</p>
+                <canvas id="symptomChart" width="400" height="200"></canvas>
+            </div>
+        
+            <div class="recommendations">
+                <h2>Professional Coping Strategies</h2>
+                <ul id="recommendations-list"></ul>
+            </div>
+            
+            <div class="email-form">
+                <h2>Receive Your Detailed Report</h2>
+                <p>Enter your email to receive a comprehensive ADHD assessment report with detailed analysis, personalized recommendations, and symptom insights.</p>
+                
+                <form id="emailForm" action="https://api.web3forms.com/submit" method="POST">
+                    <input type="hidden" name="access_key" value="3827a11b-3ca4-4126-b4d9-14aefffa1da5">
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your mail" required>
+                    </div>
+                    
+                    <input type="hidden" name="subject" value="Your ADHD Assessment Results">
+                    <input type="hidden" name="redirect" value="">
+                    <input type="hidden" id="formData" name="assessment_data" value="">
+                    <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+                    
+                    <button type="submit" id="sendReport" class="submit-btn">Send My Report</button>
+                </form>
+                
+                <div id="sent-notification" class="sent-notification">
+                    Your detailed report has been sent! Please check your email inbox.
+                </div>
+            </div>
+        
+            <a href="/Mental-Health-Assessments.html" id="retakeBtn" class="minimal-button" style="margin-top: 2rem; display: inline-block;">Retake Assessment</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const questions = [
+            // Inattention & Focus Issues
+            "How often do you struggle to stay focused on tasks or activities, especially those that require sustained mental effort?",
+            "Do you frequently make careless mistakes in your work, school, or other activities?",
+            
+            // Hyperactivity & Restlessness
+            "Do you feel the need to move constantly or struggle to stay seated for long periods?",
+            "Do you often feel overly energetic, even when it's inappropriate for the situation?",
+            
+            // Impulsivity & Decision-Making
+            "Do you frequently interrupt others when they are speaking?",
+            "Do you make impulsive decisions without considering the consequences?",
+            
+            // Emotional Regulation & Mood Swings
+            "Do you experience sudden mood swings or emotional outbursts?",
+            "Do you feel frustrated or overwhelmed easily?",
+            
+            // Daily Functioning & Productivity
+            "Do you frequently procrastinate on important tasks, even when they are urgent?",
+            "Do you feel disorganized or struggle to keep track of important things?"
+        ];
+
+        const categories = {
+            "Inattention & Focus": [0, 1],
+            "Hyperactivity & Restlessness": [2, 3],
+            "Impulsivity & Decision-Making": [4, 5],
+            "Emotional Regulation": [6, 7],
+            "Daily Functioning": [8, 9]
+        };
+
+        function generateSymptomData() {
+            const days = 14; // Past two weeks
+            const symptomData = [];
+            
+            let baseSymptom = Math.random() * 10;
+            
+            for (let i = days; i >= 1; i--) {
+                baseSymptom = Math.max(0, Math.min(10, baseSymptom + (Math.random() - 0.5) * 2));
+                symptomData.push({
+                    day: `Day ${i}`,
+                    symptomIntensity: baseSymptom
+                });
+            }
+            
+            return symptomData;
+        }
+
+        let currentQuestion = 0;
+        let answers = new Array(questions.length).fill(null);
+        let assessmentDate = new Date();
+        let symptomData = generateSymptomData();
+
+        const quiz = document.querySelector('.quiz');
+        const results = document.querySelector('.results');
+        const questionText = document.getElementById('question-text');
+        const progressBar = document.querySelector('.progress-bar');
+        const options = document.querySelectorAll('.option');
+        const prevButton = document.getElementById('prev');
+        const nextButton = document.getElementById('next');
+        const retakeButton = document.getElementById('retakeBtn');
+
+        function updateQuestion() {
+            questionText.textContent = `${currentQuestion + 1}. ${questions[currentQuestion]}`;
+            progressBar.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            prevButton.disabled = currentQuestion === 0;
+            nextButton.textContent = currentQuestion === questions.length - 1 ? 'Finish' : 'Next';
+
+            options.forEach(option => {
+                option.classList.remove('selected');
+                if (answers[currentQuestion] === parseInt(option.dataset.value)) {
+                    option.classList.add('selected');
+                }
+            });
+        }
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                options.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                answers[currentQuestion] = parseInt(option.dataset.value);
+            });
+        });
+
+        prevButton.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                updateQuestion();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (answers[currentQuestion] === null) {
+                alert('Please select an answer before proceeding.');
+                return;
+            }
+
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                updateQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        retakeButton.addEventListener('click', () => {
+            currentQuestion = 0;
+            answers = new Array(questions.length).fill(null);
+            assessmentDate = new Date();
+            symptomData = generateSymptomData();
+            
+            quiz.style.display = 'block';
+            results.style.display = 'none';
+            
+            document.getElementById('sent-notification').style.display = 'none';
+            
+            updateQuestion();
+        });
+
+        function showResults() {
+            quiz.style.display = 'none';
+            results.style.display = 'block';
+            
+            const totalScore = answers.reduce((sum, val) => sum + val, 0);
+            const maxScore = questions.length * 3;
+            
+            const categoryScores = {};
+            for (const [category, indices] of Object.entries(categories)) {
+                const sum = indices.reduce((acc, index) => acc + answers[index], 0);
+                const maxPossible = indices.length * 3;
+                categoryScores[category] = {
+                    score: sum,
+                    percentage: (sum / maxPossible) * 100
+                };
+            }
+            
+            let adhdLevel = '';
+            let resultText = '';
+            let recommendations = [];
+
+            if (totalScore <= 10) {
+            adhdLevel = 'Minimal or No ADHD Traits';
+            resultText = `Your score (${totalScore}/${maxScore}) indicates minimal ADHD symptoms.`;
+            recommendations = [
+                "Continue maintaining focus and organization strategies",
+                "Practice mindfulness and attention-building exercises",
+                "Maintain a structured daily routine",
+                "Stay engaged in activities that promote mental clarity"
+            ];
+        } else if (totalScore <= 20) {
+            adhdLevel = 'Mild ADHD Symptoms';
+            resultText = `Your score (${totalScore}/${maxScore}) suggests mild ADHD symptoms where self-management is possible.`;
+            recommendations = [
+                "Consider consulting with a mental health professional",
+                "Develop personalized time management techniques",
+                "Explore cognitive behavioral strategies",
+                "Use productivity tools and planners",
+                "Practice stress reduction and focus-enhancing techniques"
+            ];
+        } else if (totalScore <= 30) {
+            adhdLevel = 'Moderate ADHD';
+            resultText = `Your score (${totalScore}/${maxScore}) indicates moderate ADHD symptoms. Professional therapy is recommended.`;
+            recommendations = [
+                "Seek consultation with an ADHD specialist",
+                "Consider cognitive behavioral therapy (CBT)",
+                "Explore potential medication management options",
+                "Develop comprehensive coping strategies",
+                "Engage in support groups or counseling"
+            ];
+        } else {
+            adhdLevel = 'Severe ADHD';
+            resultText = `Your score (${totalScore}/${maxScore}) suggests significant ADHD symptoms. Comprehensive professional evaluation is advised.`;
+            recommendations = [
+                "Schedule a comprehensive ADHD diagnostic assessment",
+                "Consult with a psychiatrist or ADHD specialist",
+                "Consider integrated treatment approaches",
+                "Explore medication and therapy combinations",
+                "Develop a holistic management plan with professional guidance"
+            ];
+        }
+
+        // Add category insights to the result text
+        resultText += "<br><br><strong>Category Analysis:</strong>";
+        for (const [category, data] of Object.entries(categoryScores)) {
+            resultText += `<br>• ${category}: ${data.score} (${Math.round(data.percentage)}%)`;
+        }
+
+        resultText += "<br><br><strong>Next Steps:</strong> A detailed assessment report will be sent to your email, including graphical symptom analysis, therapist-reviewed insights, and a customized management plan.";
+
+        document.getElementById('results-text').innerHTML = resultText;
+        document.getElementById('recommendations-list').innerHTML =
+            recommendations.map(rec => `<li>${rec}</li>`).join('');
+
+        // Store assessment data for email report
+        const assessmentData = {
+            date: assessmentDate.toISOString(),
+            totalScore: totalScore,
+            maxScore: maxScore,
+            adhdLevel: adhdLevel,
+            categoryScores: categoryScores,
+            recommendations: recommendations,
+            answers: answers
+        };
+        
+        // Add assessment data as hidden field value for the form
+        document.getElementById('formData').value = JSON.stringify(assessmentData);
+
+        // Create data for the category breakdown chart
+        const ctx = document.getElementById('resultsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(categoryScores),
+                datasets: [{
+                    label: 'Category Scores',
+                    data: Object.values(categoryScores).map(cat => cat.score),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true },
+                    tooltip: { 
+                        enabled: true,
+                        callbacks: {
+                            label: function(context) {
+                                const categoryName = context.label;
+                                const score = context.raw;
+                                const maxScore = categories[categoryName].length * 3;
+                                return `${categoryName}: ${score}/${maxScore} (${Math.round((score/maxScore)*100)}%)`;
+                            }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: `ADHD Level: ${adhdLevel} (${totalScore}/${maxScore})`
+                    }
+                }
+            }
+        });
+        
+        // Create symptom fluctuation line graph
+        const symptomCtx = document.getElementById('symptomChart').getContext('2d');
+        
+        // Add today's data point based on assessment score
+        const todaySymptom = (totalScore / maxScore) * 10;
+        const symptomDataForChart = [...symptomData, {
+            day: 'Today',
+            symptomIntensity: todaySymptom
+        }];
+        
+        new Chart(symptomCtx, {
+            type: 'line',
+            data: {
+                labels: symptomDataForChart.map(d => d.day),
+                datasets: [{
+                    label: 'ADHD Symptom Intensity',
+                    data: symptomDataForChart.map(d => d.symptomIntensity),
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 10,
+                        title: {
+                            display: true,
+                            text: 'Symptom Intensity (0-10)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time Period'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Your ADHD Symptom Fluctuations Over Time'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Symptom Intensity: ${context.raw.toFixed(1)}/10`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Set up email form submission with Web3Forms
+        document.getElementById('emailForm').addEventListener('submit', function(e) {
+            // Show the notification when form is submitted
+            document.getElementById('sent-notification').style.display = 'block';
+            
+            // Let Web3Forms handle the submission
+        });
+    }
+
+    // Initialize the first question
+    updateQuestion();
+</script>
+</body>
+</html>
